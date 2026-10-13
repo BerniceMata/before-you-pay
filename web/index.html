@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Before You Pay | medical bill rights checker</title>
+<meta name="description" content="Got a hospital or medical bill? Answer a few questions, see which federal patient rights apply, how many days you have left, and get the letter. Free. Nothing you type leaves your browser.">
+<link rel="canonical" href="https://mitchloveswords.com/bill">
+<meta property="og:title" content="Before you pay that medical bill">
+<meta property="og:description" content="See which patient billing rights apply to you, your deadlines, and get the letter. Free, private, 60 seconds.">
+<meta property="og:url" content="https://mitchloveswords.com/bill">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+  :root { --bg:#efece4; --paper:#fbfaf5; --ink:#16171a; --muted:#666256; --line:#d8d3c4; --red:#c2362b; --green:#1d7347;
+          --hi:#ffe46b; --chip:#f1eee4; color-scheme: light; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg:#121212; --paper:#1b1b19; --ink:#efece4; --muted:#a8a294;
+          --line:#33322d; --red:#f0705f; --green:#5fd39a; --hi:#6b5c12; --chip:#26251f; color-scheme: dark; } }
+  :root[data-theme="dark"] { --bg:#121212; --paper:#1b1b19; --ink:#efece4; --muted:#a8a294; --line:#33322d; --red:#f0705f; --green:#5fd39a;
+          --hi:#6b5c12; --chip:#26251f; color-scheme: dark; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.5 Archivo, system-ui, sans-serif; }
+  .wrap { max-width:74rem; margin:0 auto; padding-inline:16px; padding-block:2rem 4rem; }
+  .mono { font-family:"JetBrains Mono", ui-monospace, monospace; }
+  header { display:grid; gap:.6rem; margin-bottom:1.6rem; }
+  .tag { font:600 .72rem/1 "JetBrains Mono", monospace; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); }
+  h1 { font-weight:800; font-size:clamp(2.3rem,7vw,4.6rem); line-height:.95; letter-spacing:-.03em; margin:0; text-wrap:balance; }
+  h1 em { font-style:normal; background:linear-gradient(transparent 58%, var(--hi) 58%); }
+  .sub { font-size:1.12rem; max-width:40rem; margin:0; color:var(--ink); }
+  .trust { display:flex; gap:.5rem; flex-wrap:wrap; }
+  .trust span { font:500 .78rem/1 "JetBrains Mono", monospace; background:var(--paper); border:1px solid var(--line); border-radius:999px; padding:.45rem .7rem; }
+  .grid { display:grid; grid-template-columns: minmax(0,1fr) minmax(0,1.15fr); gap:18px; align-items:start; }
+  @media (max-width:900px) { .grid { grid-template-columns:1fr; } }
+  .receipt { background:var(--paper); border-radius:4px; padding:1.3rem 1.2rem 1.6rem; position:relative; box-shadow:0 1px 0 var(--line), 0 18px 40px -28px rgba(0,0,0,.35); }
+  .receipt::after { content:""; position:absolute; left:0; right:0; bottom:-9px; height:10px;
+    background:radial-gradient(circle at 6px -2px, transparent 7px, var(--paper) 7.5px) 0 0/12px 10px repeat-x; }
+  .q { padding:.8rem 0; border-bottom:1px dashed var(--line); }
+  .q:last-child { border-bottom:0; }
+  .q > label, .q > .ql { display:block; font-weight:700; margin-bottom:.45rem; }
+  .seg { display:flex; flex-wrap:wrap; gap:6px; }
+  .seg button { font:500 .92rem Archivo, sans-serif; border:1.5px solid var(--line); background:transparent; color:var(--ink); border-radius:8px; padding:.5rem .8rem; cursor:pointer; }
+  .seg button[aria-pressed="true"] { border-color:var(--ink); background:var(--ink); color:var(--paper); }
+  .row2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  input[type=number], input[type=date], input[type=text], select, textarea { width:100%; font:500 1rem "JetBrains Mono", monospace; color:var(--ink); background:var(--chip);
+    border:1.5px solid var(--line); border-radius:8px; padding:.55rem .65rem; }
+  .hint { font-size:.8rem; color:var(--muted); margin-top:.3rem; }
+  .results h2 { font-weight:800; font-size:1.5rem; margin:.2rem 0 1rem; letter-spacing:-.01em; }
+  .card { background:var(--paper); border-radius:4px; padding:1rem 1.1rem; margin-bottom:12px; border-left:5px solid var(--green); }
+  .card.urgent { border-left-color:var(--red); }
+  .card h3 { margin:0 0 .35rem; font-size:1.08rem; line-height:1.3; }
+  .card p { margin:.25rem 0; font-size:.94rem; }
+  .chip { display:inline-flex; gap:.4rem; align-items:center; font:600 .78rem/1 "JetBrains Mono", monospace; padding:.4rem .55rem; border-radius:6px; background:var(--hi); color:var(--ink); margin:.35rem 0; }
+  .chip.red { background:var(--red); color:#fff; }
+  .card .act { font-weight:600; }
+  .card .src { font-size:.78rem; color:var(--muted); }
+  .card .src a { color:var(--muted); }
+  .btn { font:700 .92rem Archivo, sans-serif; border:0; border-radius:8px; padding:.6rem .95rem; cursor:pointer; background:var(--ink); color:var(--paper); margin-top:.5rem; }
+  .btn.ghost { background:transparent; color:var(--ink); border:1.5px solid var(--ink); }
+  .stamp { position:absolute; right:14px; top:12px; transform:rotate(8deg); border:3px solid var(--red); color:var(--red); font:800 .8rem/1 "JetBrains Mono", monospace; letter-spacing:.12em; padding:.35rem .5rem; border-radius:6px; opacity:.85; }
+  dialog { border:0; border-radius:6px; padding:0; width:min(56rem, calc(100vw - 32px)); background:var(--paper); color:var(--ink); }
+  dialog::backdrop { background:rgba(0,0,0,.5); }
+  .dlg { display:grid; grid-template-columns: 17rem 1fr; }
+  @media (max-width:760px) { .dlg { grid-template-columns:1fr; } }
+  .dlg aside { padding:1rem; border-right:1px dashed var(--line); display:grid; gap:.55rem; align-content:start; }
+  .dlg aside label { font-size:.8rem; color:var(--muted); display:grid; gap:.2rem; }
+  .dlg pre { margin:0; padding:1rem 1.2rem; white-space:pre-wrap; font:400 .86rem/1.55 "JetBrains Mono", monospace; max-height:70vh; overflow:auto; }
+  .dlg .bar { display:flex; gap:.5rem; flex-wrap:wrap; padding:.8rem 1rem; border-top:1px dashed var(--line); grid-column:1 / -1; }
+  table.lines { width:100%; border-collapse:collapse; font:400 .82rem "JetBrains Mono", monospace; }
+  table.lines td, table.lines th { border-bottom:1px dashed var(--line); padding:.35rem .25rem; text-align:left; }
+  table.lines input { padding:.3rem .35rem; font-size:.8rem; }
+  .flag { color:var(--red); font-weight:600; }
+  .section { margin-top:2.4rem; }
+  .section h2 { font-weight:800; font-size:1.5rem; margin:0 0 .4rem; }
+  .fine { font-size:.8rem; color:var(--muted); max-width:52rem; }
+  .empty { color:var(--muted); font-size:.95rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="tag">Before You Pay &middot; free &middot; no signup</div>
+    <h1>Before you pay that <em>medical bill</em>.</h1>
+    <p class="sub">Answer a few questions. See which federal patient rights apply to you, how many days you have left, and get the letter to send.</p>
+    <div class="trust"><span>Nothing you type leaves this page</span><span>Every right cites its source</span><span>Self-help, not legal advice</span></div>
+  </header>
+
+  <div class="grid">
+    <form class="receipt" id="f" onsubmit="return false">
+      <div class="q"><span class="ql">Where was the care?</span><div class="seg" data-k="setting"><button type="button" data-v="hospital">Hospital stay or surgery</button><button type="button" data-v="er">Emergency room</button><button type="button" data-v="doctor">Doctor or clinic</button><button type="button" data-v="other">Lab, imaging, other</button></div></div>
+      <div class="q"><span class="ql">Did insurance cover any of it?</span><div class="seg" data-k="insured"><button type="button" data-v="true">Yes, I have insurance</button><button type="button" data-v="false">No, uninsured or self-pay</button></div></div>
+      <div class="q"><div class="row2"><label>Bill amount ($)<input id="amount" type="number" min="0" step="1" value="3200"></label><label>Date on the first bill<input id="billDate" type="date"></label></div><div class="hint">Deadlines count from the bill date.</div></div>
+      <div class="q" data-show="uninsured"><span class="ql">Did you get a written estimate (Good Faith Estimate)?</span><div class="seg" data-k="gfe"><button type="button" data-v="true">Yes</button><button type="button" data-v="false">No</button></div>
+        <label style="margin-top:.5rem;font-weight:400" data-show="gfe">Estimate amount ($)<input id="gfeAmount" type="number" min="0" step="1" value="1800"></label></div>
+      <div class="q" data-show="insured"><span class="ql">Was it an emergency, or an out-of-network doctor at an in-network hospital?</span><div class="seg" data-k="surprise"><button type="button" data-v="yes">Yes</button><button type="button" data-v="no">No</button><button type="button" data-v="unsure">Not sure</button></div></div>
+      <div class="q" data-show="insured"><span class="ql">Did your insurance deny the claim?</span><div class="seg" data-k="denied"><button type="button" data-v="true">Yes</button><button type="button" data-v="false">No</button></div></div>
+      <div class="q" data-show="hospital"><span class="ql">Is the hospital a nonprofit?</span><div class="seg" data-k="nonprofit"><button type="button" data-v="yes">Yes</button><button type="button" data-v="no">No</button><button type="button" data-v="unsure">Not sure</button></div><div class="hint">Most US hospitals are. Search the hospital's name plus "financial assistance policy".</div></div>
+      <div class="q"><span class="ql">Do you have the itemized bill (every line and code)?</span><div class="seg" data-k="itemized"><button type="button" data-v="true">Yes</button><button type="button" data-v="false">No, just a total</button></div></div>
+      <div class="q"><span class="ql">Has it gone to collections?</span><div class="seg" data-k="collections"><button type="button" data-v="true">Yes</button><button type="button" data-v="false">No</button></div></div>
+      <div class="q"><label>State<select id="state"></select></label></div>
+    </form>
+
+    <div class="results">
+      <div class="tag" id="count"></div>
+      <h2>Your rights, most urgent first</h2>
+      <div id="rights"></div>
+    </div>
+  </div>
+
+  <section class="section" id="linesec">
+    <h2>Check the itemized bill, line by line</h2>
+    <p class="fine">Type the lines from your itemized bill. It flags exact repeats, quantities above one, and any single line that is most of the bill, then puts the ones you pick into a dispute letter. It runs on your device only.</p>
+    <div class="receipt" style="margin-top:.8rem">
+      <table class="lines"><thead><tr><th>Date</th><th>Code</th><th>Description</th><th>Qty</th><th>$</th><th></th></tr></thead><tbody id="lb"></tbody></table>
+      <button type="button" class="btn ghost" id="addLine">+ Add line</button>
+      <div id="lineOut" style="margin-top:.8rem"></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>What this is</h2>
+    <p class="fine">Before You Pay turns public rules into plain steps: the IRS rules for nonprofit hospital financial assistance (Section 501(r)), the No Surprises Act and its Good Faith Estimate dispute, your HIPAA right to your billing records, Texas SB 490, and the CFPB's debt dispute guidance. It doesn't store, send or see anything you enter. It's self-help information, not legal or financial advice. For a large or complex bill, talk to a patient advocate or an attorney. Built by <a href="/work">Mitchell Nicholas</a>, former medical assistant.</p>
+  </section>
+</div>
+
+<dialog id="dlg">
+  <div class="dlg">
+    <aside id="fields"></aside>
+    <pre id="letterText"></pre>
+    <div class="bar"><button class="btn" id="copyBtn" type="button">Copy letter</button><button class="btn ghost" id="dlBtn" type="button">Download .txt</button><button class="btn ghost" id="printBtn" type="button">Print</button><button class="btn ghost" id="closeBtn" type="button">Close</button><span class="hint" id="copied"></span></div>
+  </div>
+</dialog>
+
+<script type="module">
+import { rightsFor, checkLines, SOURCES } from "./rules.js";
+import { letter, LETTER_NAMES } from "./letters.js";
+
+const STATES = "AL AK AZ AR CA CO CT DE DC FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS MO MT NE NV NH NJ NM NY NC ND OH OK OR PA RI SC SD TN TX UT VT VA WA WV WI WY".split(" ");
+const today = new Date().toISOString().slice(0, 10);
+const A = { setting: "hospital", insured: false, gfe: true, surprise: "unsure", denied: false, nonprofit: "unsure", itemized: false, collections: false, state: "TX" };
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+// usage counting: one anonymous event per kind per page view, no answers or personal data
+const sent = new Set();
+function ev(name) {
+  if (sent.has(name)) return; sent.add(name);
+  try { navigator.sendBeacon("/api/hit", new Blob([JSON.stringify({ path: "/bill/e/" + name, src: "", ref: "" })], { type: "application/json" })); } catch (e) {}
+}
+
+$("state").innerHTML = STATES.map((s) => `<option${s === "TX" ? " selected" : ""}>${s}</option>`).join("");
+const d = new Date(); d.setDate(d.getDate() - 42); $("billDate").value = d.toISOString().slice(0, 10);
+
+document.querySelectorAll(".seg").forEach((seg) => {
+  seg.addEventListener("click", (e) => {
+    const b = e.target.closest("button"); if (!b) return;
+    const v = b.dataset.v; A[seg.dataset.k] = v === "true" ? true : v === "false" ? false : v;
+    ev("answered"); render();
+  });
+});
+["amount", "billDate", "gfeAmount", "state"].forEach((id) => $(id).addEventListener("input", () => { ev("answered"); render(); }));
+
+function answers() {
+  return { ...A, amount: Number($("amount").value) || 0, billDate: $("billDate").value, gfeAmount: Number($("gfeAmount").value) || 0, state: $("state").value };
+}
+
+let current = [];
+function render() {
+  document.querySelectorAll(".seg").forEach((seg) => seg.querySelectorAll("button").forEach((b) => {
+    const v = b.dataset.v, cur = A[seg.dataset.k];
+    b.setAttribute("aria-pressed", String(cur) === v);
+  }));
+  document.querySelectorAll("[data-show]").forEach((el) => {
+    const k = el.dataset.show;
+    el.hidden = (k === "uninsured" && A.insured) || (k === "insured" && !A.insured) || (k === "gfe" && !A.gfe) ||
+      (k === "hospital" && !(A.setting === "hospital" || A.setting === "er"));
+  });
+  const a = answers();
+  current = rightsFor(a, today);
+  $("count").textContent = `${current.length} right${current.length === 1 ? "" : "s"} apply`;
+  $("rights").innerHTML = current.map((r, i) => {
+    const urgent = r.daysLeft !== null && r.daysLeft <= 30;
+    const chip = r.deadline ? (r.daysLeft < 0 ? `<span class="chip red">Deadline passed ${-r.daysLeft} days ago</span>` :
+      `<span class="chip ${urgent ? "red" : ""}">${r.daysLeft} days left &middot; ${esc(r.deadlineLabel)}</span>`) : "";
+    return `<div class="card ${urgent ? "urgent" : ""}"><h3>${esc(r.title)}</h3>${chip}<p>${esc(r.why)}</p><p class="act">${esc(r.action)}</p>
+      ${r.letter ? `<button class="btn" type="button" data-letter="${r.letter}">Write the letter</button>` : ""}
+      <p class="src">Source: ${r.sources.map((s) => `<a href="${s.url}" target="_blank" rel="noopener">${esc(s.label)}</a>`).join(" &middot; ")}</p></div>`;
+  }).join("");
+  ev("rights_shown");
+}
+
+// letter editor
+const F = { name: "", address: "", provider: "", providerAddress: "", account: "", serviceDate: "", patient: "" };
+const FIELD_LABELS = { name: "Your full name", address: "Your mailing address", provider: "Hospital or provider", providerAddress: "Billing address (from the bill)", account: "Account number", serviceDate: "Date(s) of service", patient: "Patient name (if not you)" };
+let openId = null, extra = {};
+function showLetter() {
+  const a = answers();
+  const txt = letter(openId, { ...F, state: a.state, today: new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) },
+    { amount: a.amount, gfeAmount: a.gfeAmount, ...extra });
+  $("letterText").textContent = txt;
+  return txt;
+}
+function openLetter(id, ex = {}) {
+  openId = id; extra = ex;
+  $("fields").innerHTML = `<div class="tag">${esc(LETTER_NAMES[id])}</div>` + Object.entries(FIELD_LABELS).map(([k, l]) =>
+    `<label>${l}<input type="text" data-f="${k}" value="${esc(F[k])}"></label>`).join("") +
+    `<p class="hint">Stays on this device. Send it by certified mail or the provider's portal, and keep a copy.</p>`;
+  $("fields").querySelectorAll("input").forEach((i) => i.addEventListener("input", () => { F[i.dataset.f] = i.value; showLetter(); }));
+  showLetter(); $("copied").textContent = ""; $("dlg").showModal(); ev("letter_open_" + id);
+}
+$("rights").addEventListener("click", (e) => { const b = e.target.closest("[data-letter]"); if (b) openLetter(b.dataset.letter); });
+$("closeBtn").onclick = () => $("dlg").close();
+$("copyBtn").onclick = async () => {
+  const t = showLetter();
+  try { await navigator.clipboard.writeText(t); $("copied").textContent = "Copied."; }
+  catch (e) { const r = document.createRange(); r.selectNodeContents($("letterText")); const s = getSelection(); s.removeAllRanges(); s.addRange(r); $("copied").textContent = "Selected: press Ctrl+C."; }
+  ev("letter_copy_" + openId);
+};
+$("dlBtn").onclick = () => {
+  const blob = new Blob([showLetter()], { type: "text/plain" }); const u = URL.createObjectURL(blob);
+  const a = document.createElement("a"); a.href = u; a.download = `${openId}-letter.txt`; a.click(); setTimeout(() => URL.revokeObjectURL(u), 1000);
+  ev("letter_download_" + openId);
+};
+$("printBtn").onclick = () => {
+  const w = window.open("", "_blank"); if (!w) return;
+  w.document.write(`<pre style="font:14px/1.6 Georgia,serif;white-space:pre-wrap;max-width:40rem;margin:2rem auto">${esc(showLetter())}</pre>`);
+  w.document.close(); w.print(); ev("letter_print_" + openId);
+};
+
+// line checker
+const lines = [{ date: "", code: "", desc: "", qty: 1, amount: "" }, { date: "", code: "", desc: "", qty: 1, amount: "" }, { date: "", code: "", desc: "", qty: 1, amount: "" }];
+function drawLines() {
+  $("lb").innerHTML = lines.map((l, i) => `<tr>${["date", "code", "desc", "qty", "amount"].map((k) =>
+    `<td><input type="${k === "qty" || k === "amount" ? "number" : "text"}" data-i="${i}" data-k="${k}" value="${esc(l[k])}" aria-label="${k}"></td>`).join("")}
+    <td><button type="button" class="btn ghost" style="margin:0;padding:.25rem .5rem" data-del="${i}" aria-label="remove line">&times;</button></td></tr>`).join("");
+}
+function runLines() {
+  const filled = lines.filter((l) => l.desc || l.code || l.amount);
+  if (filled.length < 2) { $("lineOut").innerHTML = `<p class="empty">Add at least two lines to check.</p>`; return; }
+  const { total, findings } = checkLines(filled);
+  ev("lines_checked");
+  const byLine = {}; findings.forEach((f) => (byLine[f.line] = byLine[f.line] || []).push(f.note));
+  $("lineOut").innerHTML = `<p class="mono">Total entered: $${total.toLocaleString()}</p>` +
+    (findings.length ? filled.map((l, i) => byLine[i] ? `<p><label><input type="checkbox" data-pick="${i}" checked> <span class="flag">Line ${i + 1}</span>: ${esc(l.desc || l.code)} $${esc(l.amount)}<br><span class="hint">${byLine[i].map(esc).join(" ")}</span></label></p>` : "").join("") +
+      `<button class="btn" type="button" id="toDispute">Put checked lines in a dispute letter</button>` :
+      `<p class="empty">No exact repeats or quantity flags. Still check each line for anything you didn't receive, and ask for the hospital's posted cash price on the biggest items.</p>`);
+  const t = $("toDispute");
+  if (t) t.onclick = () => {
+    const disputed = [...document.querySelectorAll("[data-pick]:checked")].map((c) => ({ ...filled[+c.dataset.pick], note: byLine[+c.dataset.pick].join(" ") }));
+    openLetter("errors", { disputed });
+  };
+}
+$("lb").addEventListener("input", (e) => { const i = e.target.dataset.i, k = e.target.dataset.k; if (i === undefined) return; lines[i][k] = e.target.value; runLines(); });
+$("lb").addEventListener("click", (e) => { const d = e.target.closest("[data-del]"); if (d) { lines.splice(+d.dataset.del, 1); drawLines(); runLines(); } });
+$("addLine").onclick = () => { lines.push({ date: "", code: "", desc: "", qty: 1, amount: "" }); drawLines(); };
+drawLines(); runLines(); render();
+</script>
+<script defer src="/src.js"></script>
+</body>
+</html>
