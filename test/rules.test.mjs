@@ -94,3 +94,11 @@ test("Texas itemized right now cites the statute", () => {
   const tx = rightsFor(base).find((x) => x.id === "itemized");
   assert.ok(tx.sources.some((s) => s.url.includes("185.002")));
 });
+
+test("Spanish strings exist for every English key and the cards come back in Spanish", async () => {
+  const { STR } = await import("../web/rules.js");
+  assert.deepEqual(Object.keys(STR.es).sort(), Object.keys(STR.en).sort());
+  const r = rightsFor(base, "2026-10-13", "es");
+  assert.match(r[0].title, /estimación de buena fe/);
+  assert.ok(r.every((x) => !/\b(the|and|your)\b/i.test(x.title)));
+});

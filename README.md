@@ -15,6 +15,9 @@ Live: https://mitchloveswords.com/bill
 
 The hospital question is answered for you from the CMS Hospital General Information dataset (5,419 Medicare hospitals), split per state in `web/hospitals/` and loaded on the page. Rebuild with `python build_hospitals.py` after downloading the CSV from https://data.cms.gov/provider-data/dataset/xubh-q36u.
 
+## Languages
+English and Spanish (`/bill/es` or the toggle; Spanish terms follow CMS's own Spanish pages: estimación de buena fe, Ley Sin Sorpresas). Letters stay in English because they go to US billing offices; in Spanish mode each letter carries a note explaining what it says. French and Chinese are next; add a language by filling `STR.<lang>` in `web/rules.js` and `T`/`UI.<lang>` in `web/index.html`, and the test checks the keys match.
+
 ## How it stays honest
 - Every right cites its public source, shown on the card.
 - Deadlines that are federal floors (the 240-day financial assistance window) are marked soft and never shown as "missed", because hospitals accept late applications and some states forbid deadlines.
@@ -24,7 +27,7 @@ The hospital question is answered for you from the CMS Hospital General Informat
 
 ## Run
 ```
-node --test          # 14 tests, no network
+node --test          # 15 tests, no network
 python -m http.server --directory web 8000
 ```
 
