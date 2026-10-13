@@ -19,9 +19,11 @@ test("$399 over the estimate does not qualify for the dispute", () => {
   assert.ok(!r.some((x) => x.id === "gfe"));
 });
 
-test("for-profit hospital gets no 501(r) financial assistance right", () => {
-  assert.ok(!rightsFor({ ...base, nonprofit: "no" }).some((x) => x.id === "fap"));
-  assert.ok(rightsFor(base).some((x) => x.id === "fap"));
+test("for-profit hospital in a state without a charity law gets 'ask anyway', with no federal 501(r) source", () => {
+  const r = rightsFor({ ...base, nonprofit: "no" }).find((x) => x.id === "fap");
+  assert.match(r.title, /Ask anyway/);
+  assert.ok(!r.sources.some((s) => s.url.includes("501r")));
+  assert.ok(rightsFor(base).find((x) => x.id === "fap").sources.some((s) => s.url.includes("501r")));
 });
 
 test("insured surprise bill gets the No Surprises Act letter, not the GFE dispute", () => {
@@ -63,4 +65,32 @@ test("hospital lookup files exist for TX and classify ownership into three kinds
   const tx = JSON.parse(fs.readFileSync(new URL("../web/hospitals/TX.json", import.meta.url)));
   assert.ok(tx.length > 400);
   assert.deepEqual([...new Set(tx.map((h) => h[2]))].sort(), ["for-profit", "government", "nonprofit"]);
+});
+
+test("for-profit hospital in California still gets charity care, by state law", () => {
+  const r = rightsFor({ ...base, state: "CA", nonprofit: "no" }).find((x) => x.id === "fap");
+  assert.match(r.title, /state requires it/);
+  assert.equal(r.deadline, null);
+});
+
+test("New York shows no 240-day countdown; Washington keeps a soft one", () => {
+  assert.equal(rightsFor({ ...base, state: "NY" }).find((x) => x.id === "fap").deadline, null);
+  const wa = rightsFor({ ...base, state: "WA" }).find((x) => x.id === "fap");
+  assert.ok(wa.deadline && wa.soft);
+});
+
+test("federal 501(r) card is soft: it is never sorted as a hard deadline ahead of the GFE dispute", () => {
+  const r = rightsFor(base, "2026-10-13");
+  assert.equal(r[0].id, "gfe");
+  assert.ok(r.find((x) => x.id === "fap").soft);
+});
+
+test("estimate received late keeps the dispute card but says the process may not be open", () => {
+  const r = rightsFor({ ...base, gfeEarly: false }).find((x) => x.id === "gfe");
+  assert.match(r.why, /may not be open/);
+});
+
+test("Texas itemized right now cites the statute", () => {
+  const tx = rightsFor(base).find((x) => x.id === "itemized");
+  assert.ok(tx.sources.some((s) => s.url.includes("185.002")));
 });

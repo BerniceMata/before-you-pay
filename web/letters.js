@@ -40,7 +40,7 @@ ${hold}`,
 
 I received a Good Faith Estimate of $${money(extra.gfeAmount, "estimate amount")} for this care. The bill I received is $${money(extra.amount, "bill amount")}, which is at least $400 more than the estimate. I am disputing this bill through the federal patient-provider dispute resolution process, and I am filing with the Centers for Medicare & Medicaid Services within 120 days of the bill date.
 
-While the dispute is pending, please do not send this bill to collections or charge late fees. If you would like to settle before a decision, please contact me in writing.`,
+While the dispute is pending, federal rules bar sending this bill to collections, threatening to, charging late fees, or taking any retaliatory action, and I expect those protections to be honored. If you would like to settle before a decision, please contact me in writing.`,
     nsa: `To the billing department:
 
 I am writing about a bill for care I believe is protected by the federal No Surprises Act: ${blank(extra.reason, "emergency care / an out-of-network provider at an in-network facility / air ambulance")}. Under the Act, I should owe only my in-network cost-sharing, as shown on my health plan's Explanation of Benefits.

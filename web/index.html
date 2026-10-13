@@ -90,7 +90,8 @@
       <div class="q"><span class="ql">Did insurance cover any of it?</span><div class="seg" data-k="insured"><button type="button" data-v="true">Yes, I have insurance</button><button type="button" data-v="false">No, uninsured or self-pay</button></div></div>
       <div class="q"><div class="row2"><label>Bill amount ($)<input id="amount" type="number" min="0" step="1" value="3200"></label><label>Date on the first bill<input id="billDate" type="date"></label></div><div class="hint">Deadlines count from the bill date.</div></div>
       <div class="q" data-show="uninsured"><span class="ql">Did you get a written estimate (Good Faith Estimate)?</span><div class="seg" data-k="gfe"><button type="button" data-v="true">Yes</button><button type="button" data-v="false">No</button></div>
-        <label style="margin-top:.5rem;font-weight:400" data-show="gfe">Estimate amount ($)<input id="gfeAmount" type="number" min="0" step="1" value="1800"></label></div>
+        <label style="margin-top:.5rem;font-weight:400" data-show="gfe">Estimate amount from this provider ($)<input id="gfeAmount" type="number" min="0" step="1" value="1800"></label>
+        <div data-show="gfe" style="margin-top:.6rem"><span class="ql" style="font-weight:600">Did you get the estimate at least 3 business days before the care?</span><div class="seg" data-k="gfeEarly"><button type="button" data-v="true">Yes</button><button type="button" data-v="false">No, or not sure</button></div><div class="hint">The dispute compares one provider's bill with that same provider's estimate.</div></div></div>
       <div class="q" data-show="insured"><span class="ql">Was it an emergency, or an out-of-network doctor at an in-network hospital?</span><div class="seg" data-k="surprise"><button type="button" data-v="yes">Yes</button><button type="button" data-v="no">No</button><button type="button" data-v="unsure">Not sure</button></div></div>
       <div class="q" data-show="insured"><span class="ql">Did your insurance deny the claim?</span><div class="seg" data-k="denied"><button type="button" data-v="true">Yes</button><button type="button" data-v="false">No</button></div></div>
       <div class="q" data-show="hospital"><label>Hospital name<input id="hospital" type="text" list="hospList" autocomplete="off" placeholder="Start typing, pick from the list"><datalist id="hospList"></datalist></label><div class="hint" id="hospHint">We look it up in the CMS hospital list for your state (loaded on this page, nothing is sent).</div></div>
@@ -137,7 +138,7 @@ import { letter, LETTER_NAMES } from "./letters.js";
 
 const STATES = "AL AK AZ AR CA CO CT DE DC FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS MO MT NE NV NH NJ NM NY NC ND OH OK OR PA RI SC SD TN TX UT VT VA WA WV WI WY".split(" ");
 const today = new Date().toISOString().slice(0, 10);
-const A = { setting: "hospital", insured: false, gfe: true, surprise: "unsure", denied: false, nonprofit: "unsure", itemized: false, collections: false, state: "TX" };
+const A = { setting: "hospital", insured: false, gfe: true, gfeEarly: true, surprise: "unsure", denied: false, nonprofit: "unsure", itemized: false, collections: false, state: "TX" };
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
@@ -199,9 +200,12 @@ function render() {
   current = rightsFor(a, today);
   $("count").textContent = `${current.length} right${current.length === 1 ? "" : "s"} apply`;
   $("rights").innerHTML = current.map((r, i) => {
-    const urgent = r.daysLeft !== null && r.daysLeft <= 30;
-    const chip = r.deadline ? (r.daysLeft < 0 ? `<span class="chip red">Deadline passed ${-r.daysLeft} days ago</span>` :
-      `<span class="chip ${urgent ? "red" : ""}">${r.daysLeft} days left &middot; ${esc(r.deadlineLabel)}</span>`) : "";
+    const urgent = r.daysLeft !== null && r.daysLeft <= 30 && !r.soft;
+    const chip = !r.deadline ? "" : r.soft
+      ? (r.daysLeft < 0 ? `<span class="chip">The 240-day federal window has passed on paper. Apply anyway: hospitals often accept late applications and some states forbid deadlines.</span>`
+                        : `<span class="chip">${r.daysLeft} days left in the federal window &middot; apply anyway if it passes</span>`)
+      : (r.daysLeft < 0 ? `<span class="chip red">Deadline passed ${-r.daysLeft} days ago</span>`
+                        : `<span class="chip ${urgent ? "red" : ""}">${r.daysLeft} days left &middot; ${esc(r.deadlineLabel)}</span>`);
     return `<div class="card ${urgent ? "urgent" : ""}"><h3>${esc(r.title)}</h3>${chip}<p>${esc(r.why)}</p><p class="act">${esc(r.action)}</p>
       ${r.letter ? `<button class="btn" type="button" data-letter="${r.letter}">Write the letter</button>` : ""}
       <p class="src">Source: ${r.sources.map((s) => `<a href="${s.url}" target="_blank" rel="noopener">${esc(s.label)}</a>`).join(" &middot; ")}</p></div>`;
