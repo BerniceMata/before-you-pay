@@ -227,7 +227,7 @@ document.querySelectorAll(".lang button").forEach((b) => b.addEventListener("cli
 const sent = new Set();
 function ev(name) {
   if (sent.has(name)) return; sent.add(name);
-  try { navigator.sendBeacon("/api/hit", new Blob([JSON.stringify({ path: "/bill/e/" + name, src: "", ref: "" })], { type: "application/json" })); } catch (e) {}
+  try { navigator.sendBeacon("/api/hit", new Blob([JSON.stringify({ path: "/bill/e/" + name, src: "", ref: "" })], { type: "text/plain" })); } catch (e) {}
 }
 
 $("state").innerHTML = STATES.map((s) => `<option${s === "TX" ? " selected" : ""}>${s}</option>`).join("");
