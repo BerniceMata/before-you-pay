@@ -11,7 +11,7 @@ export const SOURCES = {
   gfe: { label: "CMS: dispute a bill that is $400 or more over your Good Faith Estimate", url: "https://www.cms.gov/initiatives/your-patient-rights/medical-bill-rights/get-help/dispute-bill" },
   portal: { label: "CMS patient-provider dispute portal", url: "https://nsa-idr.cms.gov/billdisputes/s/" },
   rights: { label: "CMS: medical bill rights (help line 1-800-985-3059)", url: "https://www.cms.gov/medical-bill-rights" },
-  rights_es: { label: "CMS: derechos sobre facturas médicas, en español (línea de ayuda 1-800-985-3059)", url: "https://www.cms.gov/es/medical-bill-rights" },
+  rights_es: { label: "CMS: derechos sobre facturas médicas (línea de ayuda 1-800-985-3059, atiende en español)", url: "https://www.cms.gov/medical-bill-rights" },
   appeal: { label: "HealthCare.gov: appealing a health plan decision", url: "https://www.healthcare.gov/appeal-insurance-company-decision/internal-appeals/" },
   kff: { label: "KFF: hospital charity care, how it works and why it matters", url: "https://www.kff.org/health-costs/hospital-charity-care-how-it-works-and-why-it-matters/" },
   cms_hosp: { label: "CMS Hospital General Information dataset (ownership type)", url: "https://data.cms.gov/provider-data/dataset/xubh-q36u" },
@@ -19,7 +19,7 @@ export const SOURCES = {
   ca: { label: "California HCAI: Hospital Fair Pricing Act (charity care up to 400% of the poverty level)", url: "https://hcai.ca.gov/data-and-reports/hospital-fair-pricing/" },
   ny: { label: "New York Attorney General: hospital financial assistance (up to 400% of the poverty level, no application deadline)", url: "https://ag.ny.gov/resources/individuals/health-care-insurance/hospital-financial-assistance" },
   wa: { label: "Washington RCW 70.170.060: charity care", url: "https://law.justia.com/codes/washington/title-70/chapter-70-170/section-70-170-060" },
-  co: { label: "Colorado Attorney General: hospital discounted care notice (HB21-1198)", url: "https://coag.gov/app/uploads/2022/08/HB-22-1403-Notice-Healthcare-Billing-Requirements-for-Indigent-Patients.pdf" },
+  co: { label: "Colorado General Assembly: HB21-1198, Health-care Billing Requirements for Indigent Patients", url: "https://leg.colorado.gov/bills/hb21-1198" },
   md: { label: "Maryland Health-General 19-214.1: free and reduced-cost care", url: "https://mgaleg.maryland.gov/2026RS/Statute_Web/ghg/19-214.1.pdf" },
 };
 
@@ -68,8 +68,11 @@ export const STR = {
     coll_np: " A nonprofit hospital also has limits on collection actions while a financial assistance application is open.",
     coll_act: "Send the dispute letter, then pay nothing on this debt until it is verified.",
     dup: (n) => `Same item, date and amount as line ${n}. Ask whether you received it twice.`,
+    dup_ask: (n) => `this charge is identical to line ${n} (same item, date and amount). Please confirm whether it was billed twice and remove it if so.`,
     qty: (q) => `Quantity ${q}. Some items are correctly billed in multiples; ask what each unit was and whether you received that many.`,
+    qty_ask: (q) => `this line shows a quantity of ${q}. Please explain what each unit was and confirm I received that many.`,
     large: "This one line is over 40% of the bill. Ask what it covers and for the hospital's posted cash price for it.",
+    large_ask: "this single line is most of the bill. Please itemize what it covers and send the hospital's posted cash price for it.",
   },
   es: {
     itemized_t: "Pida la factura detallada y sus registros de facturación",
@@ -114,8 +117,11 @@ export const STR = {
     coll_np: " Un hospital sin fines de lucro también tiene límites en las acciones de cobro mientras una solicitud de asistencia financiera está abierta.",
     coll_act: "Envíe la carta de disputa y no pague nada de esta deuda hasta que la verifiquen.",
     dup: (n) => `Mismo artículo, fecha y monto que la línea ${n}. Pregunte si lo recibió dos veces.`,
+    dup_ask: (n) => `this charge is identical to line ${n} (same item, date and amount). Please confirm whether it was billed twice and remove it if so.`,
     qty: (q) => `Cantidad ${q}. Algunos artículos se cobran correctamente en múltiplos; pregunte qué fue cada unidad y si recibió esa cantidad.`,
+    qty_ask: (q) => `this line shows a quantity of ${q}. Please explain what each unit was and confirm I received that many.`,
     large: "Esta sola línea es más del 40% de la factura. Pregunte qué cubre y cuál es el precio de contado publicado por el hospital.",
+    large_ask: "this single line is most of the bill. Please itemize what it covers and send the hospital's posted cash price for it.",
   },
 };
 
@@ -244,10 +250,10 @@ export function checkLines(lines, lang = "en") {
   const total = lines.reduce((s, l) => s + (Number(l.amount) || 0), 0);
   lines.forEach((l, i) => {
     const key = [l.date, (l.code || "").trim().toUpperCase(), (l.desc || "").trim().toLowerCase(), Number(l.amount)].join("|");
-    if (seen.has(key)) findings.push({ line: i, kind: "duplicate", note: t.dup(seen.get(key) + 1) });
+    if (seen.has(key)) findings.push({ line: i, kind: "duplicate", note: t.dup(seen.get(key) + 1), ask: t.dup_ask(seen.get(key) + 1) });
     else seen.set(key, i);
-    if (Number(l.qty) > 1) findings.push({ line: i, kind: "quantity", note: t.qty(l.qty) });
-    if (total > 0 && Number(l.amount) / total > 0.4 && lines.length > 2) findings.push({ line: i, kind: "large", note: t.large });
+    if (Number(l.qty) > 1) findings.push({ line: i, kind: "quantity", note: t.qty(l.qty), ask: t.qty_ask(l.qty) });
+    if (total > 0 && Number(l.amount) / total > 0.4 && lines.length > 2) findings.push({ line: i, kind: "large", note: t.large, ask: t.large_ask });
   });
   return { total, findings };
 }

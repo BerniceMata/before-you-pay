@@ -6,6 +6,7 @@
 <title>Before You Pay | medical bill rights checker</title>
 <meta name="description" content="Got a hospital or medical bill? Answer a few questions, see which federal patient rights apply, how many days you have left, and get the letter. Free. Nothing you type leaves your browser.">
 <link rel="canonical" href="https://mitchloveswords.com/bill">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <meta property="og:title" content="Before you pay that medical bill">
 <meta property="og:description" content="See which patient billing rights apply to you, your deadlines, and get the letter. Free, private, 60 seconds.">
 <meta property="og:url" content="https://mitchloveswords.com/bill">
@@ -41,7 +42,7 @@
   .seg button { font:500 .92rem Archivo, sans-serif; border:1.5px solid var(--line); background:transparent; color:var(--ink); border-radius:8px; padding:.5rem .8rem; cursor:pointer; }
   .seg button[aria-pressed="true"] { border-color:var(--ink); background:var(--ink); color:var(--paper); }
   .row2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-  input[type=number], input[type=date], input[type=text], select, textarea { width:100%; font:500 1rem "JetBrains Mono", monospace; color:var(--ink); background:var(--chip);
+  input[type=number], input[type=date], input[type=text], select, textarea { width:100%; font:500 16px "JetBrains Mono", monospace; color:var(--ink); background:var(--chip);
     border:1.5px solid var(--line); border-radius:8px; padding:.55rem .65rem; }
   .hint { font-size:.8rem; color:var(--muted); margin-top:.3rem; }
   .results h2 { font-weight:800; font-size:1.5rem; margin:.2rem 0 1rem; letter-spacing:-.01em; }
@@ -92,9 +93,9 @@
     <form class="receipt" id="f" onsubmit="return false">
       <div class="q"><span class="ql">Where was the care?</span><div class="seg" data-k="setting"><button type="button" data-v="hospital">Hospital stay or surgery</button><button type="button" data-v="er">Emergency room</button><button type="button" data-v="doctor">Doctor or clinic</button><button type="button" data-v="other">Lab, imaging, other</button></div></div>
       <div class="q"><span class="ql">Did insurance cover any of it?</span><div class="seg" data-k="insured"><button type="button" data-v="true">Yes, I have insurance</button><button type="button" data-v="false">No, uninsured or self-pay</button></div></div>
-      <div class="q"><div class="row2"><label>Bill amount ($)<input id="amount" type="number" min="0" step="1" value="3200"></label><label>Date on the first bill<input id="billDate" type="date"></label></div><div class="hint">Deadlines count from the bill date.</div></div>
+      <div class="q"><div class="row2"><label>Bill amount ($)<input id="amount" type="number" min="0" step="1" placeholder="0"></label><label>Date on the first bill<input id="billDate" type="date"></label></div><div class="hint">Deadlines count from the bill date.</div></div>
       <div class="q" data-show="uninsured"><span class="ql">Did you get a written estimate (Good Faith Estimate)?</span><div class="seg" data-k="gfe"><button type="button" data-v="true">Yes</button><button type="button" data-v="false">No</button></div>
-        <label style="margin-top:.5rem;font-weight:400" data-show="gfe">Estimate amount from this provider ($)<input id="gfeAmount" type="number" min="0" step="1" value="1800"></label>
+        <label style="margin-top:.5rem;font-weight:400" data-show="gfe">Estimate amount from this provider ($)<input id="gfeAmount" type="number" min="0" step="1" placeholder="0"></label>
         <div data-show="gfe" style="margin-top:.6rem"><span class="ql" style="font-weight:600">Did you get the estimate at least 3 business days before the care?</span><div class="seg" data-k="gfeEarly"><button type="button" data-v="true">Yes</button><button type="button" data-v="false">No, or not sure</button></div><div class="hint">The dispute compares one provider's bill with that same provider's estimate.</div></div></div>
       <div class="q" data-show="insured"><span class="ql">Was it an emergency, or an out-of-network doctor at an in-network hospital?</span><div class="seg" data-k="surprise"><button type="button" data-v="yes">Yes</button><button type="button" data-v="no">No</button><button type="button" data-v="unsure">Not sure</button></div></div>
       <div class="q" data-show="insured"><span class="ql">Did your insurance deny the claim?</span><div class="seg" data-k="denied"><button type="button" data-v="true">Yes</button><button type="button" data-v="false">No</button></div></div>
@@ -148,7 +149,7 @@ const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<
 
 // language: Spanish first (Texas). Static page text is swapped by exact English string; dynamic text uses UI[lang].
 let lang = "en";
-try { lang = new URLSearchParams(location.search).get("lang") || (location.pathname.endsWith("/es") || location.pathname.endsWith("/es/") ? "es" : "") || localStorage.getItem("byp_lang") || ((navigator.language || "").toLowerCase().startsWith("es") ? "es" : "en"); } catch (e) {}
+try { lang = new URLSearchParams(location.search).get("lang") || (/\/es\/?$|factura/.test(location.pathname) ? "es" : "") || localStorage.getItem("byp_lang") || ((navigator.language || "").toLowerCase().startsWith("es") ? "es" : "en"); } catch (e) {}
 if (lang !== "es") lang = "en";
 const T = {
   "Before You Pay · free · no signup": "Before You Pay · gratis · sin registro",
@@ -173,7 +174,7 @@ const T = {
   "Copy letter": "Copiar carta", "Download .txt": "Descargar .txt", "Print": "Imprimir", "Close": "Cerrar",
 };
 const UI = {
-  en: { h1a: "Before you pay that", h1b: "medical bill", apply: (n) => `${n} right${n === 1 ? "" : "s"} apply`, write: "Write the letter", source: "Source:",
+  en: { h1a: "Before you pay that", h1b: "medical bill", apply: (n) => `${n} right${n === 1 ? " applies" : "s apply"}`, write: "Write the letter", source: "Source:",
     softPassed: "The 240-day federal window has passed on paper. Apply anyway: hospitals often accept late applications and some states forbid deadlines.",
     softLeft: (d) => `${d} days left in the federal window · apply anyway if it passes`, passed: (d) => `Deadline passed ${d} days ago`, left: (d, l) => `${d} days left · ${l}`,
     hospHint: "We look it up in the CMS hospital list for your state (loaded on this page, nothing is sent).",
@@ -231,7 +232,7 @@ function ev(name) {
 }
 
 $("state").innerHTML = STATES.map((s) => `<option${s === "TX" ? " selected" : ""}>${s}</option>`).join("");
-const d = new Date(); d.setDate(d.getDate() - 42); $("billDate").value = d.toISOString().slice(0, 10);
+// no pre-filled bill date or amounts: a stranger must never see a made-up result that reads as their own (engineering check SITE-01)
 
 document.querySelectorAll(".seg").forEach((seg) => {
   seg.addEventListener("click", (e) => {
@@ -279,6 +280,12 @@ function render() {
       (k === "hospital" && !(A.setting === "hospital" || A.setting === "er"));
   });
   const a = answers();
+  if (!a.amount || !a.billDate) {
+    $("count").textContent = "";
+    $("rights").innerHTML = `<p class="empty">${esc(lang === "es" ? "Escriba el monto de la factura y la fecha de la primera factura para ver sus derechos y plazos." : "Enter the bill amount and the date on the first bill to see your rights and deadlines.")}</p>`;
+    current = [];
+    return;
+  }
   current = rightsFor(a, today, lang);
   $("count").textContent = u().apply(current.length);
   $("rights").innerHTML = current.map((r, i) => {
@@ -351,7 +358,8 @@ function runLines() {
       `<p class="empty">${esc(u().noFlags)}</p>`);
   const t = $("toDispute");
   if (t) t.onclick = () => {
-    const disputed = [...document.querySelectorAll("[data-pick]:checked")].map((c) => ({ ...filled[+c.dataset.pick], note: byLine[+c.dataset.pick].join(" ") }));
+    const asks = {}; findings.forEach((f) => (asks[f.line] = asks[f.line] || []).push(f.ask || f.note));
+    const disputed = [...document.querySelectorAll("[data-pick]:checked")].map((c) => ({ ...filled[+c.dataset.pick], ask: asks[+c.dataset.pick].join(" ") }));
     openLetter("errors", { disputed });
   };
 }

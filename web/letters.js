@@ -55,7 +55,7 @@ Please stop collection activity until you have sent this verification. Please do
 
 I reviewed the itemized bill for the account above and I am disputing these charges:
 
-${(extra.disputed || []).map((l, i) => `${i + 1}. ${l.date || ""} ${l.code || ""} ${l.desc || ""}, $${l.amount}: ${l.note || "please explain or remove"}`).join("\n") || "[List each charge you are disputing and why]"}
+${(extra.disputed || []).map((l, i) => `${i + 1}. ${l.date || ""} ${l.code || ""} ${l.desc || ""}, $${Number(l.amount || 0).toLocaleString("en-US")}: ${l.ask || "please explain this charge or remove it"}`).join("\n") || "[List each charge you are disputing and why]"}
 
 Please review these charges, send me a corrected bill, and explain any charge you keep. ${hold}`,
   };

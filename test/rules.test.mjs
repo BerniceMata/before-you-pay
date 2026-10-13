@@ -102,3 +102,11 @@ test("Spanish strings exist for every English key and the cards come back in Spa
   assert.match(r[0].title, /estimación de buena fe/);
   assert.ok(r.every((x) => !/\b(the|and|your)\b/i.test(x.title)));
 });
+
+test("line findings carry a first-person ask for the letter, separate from the advice to the user", () => {
+  const { findings } = checkLines([{ date: "09/01", code: "99284", desc: "ER", qty: 1, amount: 1450 }, { date: "09/01", code: "99284", desc: "ER", qty: 1, amount: 1450 }, { date: "09/01", code: "36415", desc: "draw", qty: 3, amount: 300 }]);
+  for (const f of findings) { assert.ok(f.ask && !/^Ask |Ask whether|ask what/.test(f.ask)); }
+  const t = letter("errors", {}, { disputed: [{ date: "09/01", code: "99284", desc: "ER", amount: 1450, ask: findings.find((f) => f.kind === "duplicate").ask }] });
+  assert.match(t, /\$1,450: this charge is identical/);
+  assert.ok(!/Ask whether you received it twice/.test(t));
+});
