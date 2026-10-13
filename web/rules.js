@@ -9,6 +9,8 @@ export const SOURCES = {
   gfe: { label: "CMS: dispute a bill that is $400+ over your Good Faith Estimate", url: "https://www.cms.gov/nosurprises/consumers/medical-bill-rights" },
   nsa: { label: "CMS: No Surprises Act protections against surprise bills", url: "https://www.cms.gov/nosurprises" },
   appeal: { label: "HealthCare.gov: appealing a health plan decision", url: "https://www.healthcare.gov/appeal-insurance-company-decision/internal-appeals/" },
+  kff: { label: "KFF: hospital charity care, how it works and why it matters", url: "https://www.kff.org/health-costs/hospital-charity-care-how-it-works-and-why-it-matters/" },
+  cms_hosp: { label: "CMS Hospital General Information dataset (ownership type)", url: "https://data.cms.gov/provider-data/dataset/xubh-q36u" },
   fdcpa: { label: "CFPB: how to dispute a debt with a debt collector", url: "https://www.consumerfinance.gov/ask-cfpb/how-do-i-dispute-a-debt-en-1695/" },
 };
 
@@ -43,7 +45,15 @@ export function rightsFor(a, today = new Date().toISOString().slice(0, 10)) {
     deadline: null, sources: tx ? [SOURCES.hipaa, SOURCES.tx490] : [SOURCES.hipaa],
   });
 
-  if (hospital && a.nonprofit !== "no") {
+  if (hospital && a.nonprofit === "government") {
+    out.push({
+      id: "fap", letter: "fap", priority: 2,
+      title: "Ask about the hospital's own charity care program",
+      why: "This is a public hospital, so the IRS nonprofit rules don't apply to it. Most public hospitals run their own financial assistance program, often with wider eligibility than private hospitals, and some states require one.",
+      action: "Ask for the financial assistance application and ask them to hold collections while you apply.",
+      deadline: null, sources: [SOURCES.kff],
+    });
+  } else if (hospital && a.nonprofit !== "no") {
     out.push({
       id: "fap", letter: "fap", priority: 2,
       title: "Ask for financial assistance (charity care)",

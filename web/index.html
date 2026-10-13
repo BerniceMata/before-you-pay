@@ -93,7 +93,8 @@
         <label style="margin-top:.5rem;font-weight:400" data-show="gfe">Estimate amount ($)<input id="gfeAmount" type="number" min="0" step="1" value="1800"></label></div>
       <div class="q" data-show="insured"><span class="ql">Was it an emergency, or an out-of-network doctor at an in-network hospital?</span><div class="seg" data-k="surprise"><button type="button" data-v="yes">Yes</button><button type="button" data-v="no">No</button><button type="button" data-v="unsure">Not sure</button></div></div>
       <div class="q" data-show="insured"><span class="ql">Did your insurance deny the claim?</span><div class="seg" data-k="denied"><button type="button" data-v="true">Yes</button><button type="button" data-v="false">No</button></div></div>
-      <div class="q" data-show="hospital"><span class="ql">Is the hospital a nonprofit?</span><div class="seg" data-k="nonprofit"><button type="button" data-v="yes">Yes</button><button type="button" data-v="no">No</button><button type="button" data-v="unsure">Not sure</button></div><div class="hint">Most US hospitals are. Search the hospital's name plus "financial assistance policy".</div></div>
+      <div class="q" data-show="hospital"><label>Hospital name<input id="hospital" type="text" list="hospList" autocomplete="off" placeholder="Start typing, pick from the list"><datalist id="hospList"></datalist></label><div class="hint" id="hospHint">We look it up in the CMS hospital list for your state (loaded on this page, nothing is sent).</div></div>
+      <div class="q" data-show="hospital"><span class="ql">Is the hospital a nonprofit?</span><div class="seg" data-k="nonprofit"><button type="button" data-v="yes">Yes</button><button type="button" data-v="no">No, for-profit</button><button type="button" data-v="government">Public / government</button><button type="button" data-v="unsure">Not sure</button></div><div class="hint">Picking the hospital above answers this for you. Otherwise, most US hospitals are nonprofits.</div></div>
       <div class="q"><span class="ql">Do you have the itemized bill (every line and code)?</span><div class="seg" data-k="itemized"><button type="button" data-v="true">Yes</button><button type="button" data-v="false">No, just a total</button></div></div>
       <div class="q"><span class="ql">Has it gone to collections?</span><div class="seg" data-k="collections"><button type="button" data-v="true">Yes</button><button type="button" data-v="false">No</button></div></div>
       <div class="q"><label>State<select id="state"></select></label></div>
@@ -158,6 +159,26 @@ document.querySelectorAll(".seg").forEach((seg) => {
   });
 });
 ["amount", "billDate", "gfeAmount", "state"].forEach((id) => $(id).addEventListener("input", () => { ev("answered"); render(); }));
+
+// hospital lookup: CMS Hospital General Information, split per state, fetched from this site only
+let hospitals = [], hospState = "";
+async function loadHospitals() {
+  const st = $("state").value;
+  if (st === hospState) return;
+  hospState = st; hospitals = [];
+  try { hospitals = await (await fetch(`hospitals/${st}.json`)).json(); } catch (e) { hospitals = []; }
+  $("hospList").innerHTML = hospitals.map((h) => `<option value="${esc(h[0])} (${esc(h[1])})"></option>`).join("");
+}
+$("state").addEventListener("change", () => { loadHospitals(); $("hospital").value = ""; $("hospHint").textContent = "We look it up in the CMS hospital list for your state (loaded on this page, nothing is sent)."; });
+$("hospital").addEventListener("input", () => {
+  const v = $("hospital").value.trim().toLowerCase();
+  const hit = hospitals.find((h) => `${h[0]} (${h[1]})`.toLowerCase() === v);
+  if (!hit) return;
+  A.nonprofit = hit[2] === "nonprofit" ? "yes" : hit[2] === "for-profit" ? "no" : "government";
+  $("hospHint").innerHTML = `${esc(hit[0])}, ${esc(hit[1])}: listed as <b>${esc(hit[2])}</b> in the <a href="https://data.cms.gov/provider-data/dataset/xubh-q36u" target="_blank" rel="noopener">CMS hospital list</a>. Billing office: ${esc(hit[3])}.`;
+  ev("hospital_matched"); render();
+});
+loadHospitals();
 
 function answers() {
   return { ...A, amount: Number($("amount").value) || 0, billDate: $("billDate").value, gfeAmount: Number($("gfeAmount").value) || 0, state: $("state").value };

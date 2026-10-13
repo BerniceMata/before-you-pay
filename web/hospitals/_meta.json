@@ -1,0 +1,11 @@
+{
+ "source": "CMS Hospital General Information (xubh-q36u), released 2026-08-13",
+ "url": "https://data.cms.gov/provider-data/dataset/xubh-q36u",
+ "built": "2026-10-13",
+ "hospitals": 5419,
+ "kinds": [
+  "nonprofit = Voluntary non-profit (private, church, other)",
+  "for-profit = Proprietary or Physician-owned",
+  "government = federal, state, local, district, VA, DoD, tribal"
+ ]
+}

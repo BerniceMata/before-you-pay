@@ -51,3 +51,16 @@ test("letters leave visible blanks instead of inventing details", () => {
   assert.match(t, /\[Account number\]/);
   assert.match(t, /Texas law/);
 });
+
+test("public hospital gets its own charity-care card, not the 501(r) one", () => {
+  const r = rightsFor({ ...base, nonprofit: "government" }).find((x) => x.id === "fap");
+  assert.match(r.title, /own charity care/);
+  assert.equal(r.deadline, null);
+});
+
+test("hospital lookup files exist for TX and classify ownership into three kinds", async () => {
+  const fs = await import("node:fs");
+  const tx = JSON.parse(fs.readFileSync(new URL("../web/hospitals/TX.json", import.meta.url)));
+  assert.ok(tx.length > 400);
+  assert.deepEqual([...new Set(tx.map((h) => h[2]))].sort(), ["for-profit", "government", "nonprofit"]);
+});
