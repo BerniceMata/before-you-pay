@@ -21,7 +21,12 @@ export const SOURCES = {
   wa: { label: "Washington RCW 70.170.060: charity care", url: "https://law.justia.com/codes/washington/title-70/chapter-70-170/section-70-170-060" },
   co: { label: "Colorado General Assembly: HB21-1198, Health-care Billing Requirements for Indigent Patients", url: "https://leg.colorado.gov/bills/hb21-1198" },
   md: { label: "Maryland Health-General 19-214.1: free and reduced-cost care", url: "https://mgaleg.maryland.gov/2026RS/Statute_Web/ghg/19-214.1.pdf" },
+  eob: { label: "HealthCare.gov: Explanation of Benefits (EOB)", url: "https://www.healthcare.gov/glossary/explanation-of-benefits/" },
+  eob_es: { label: "HealthCare.gov: Explicación de beneficios (EOB), página en inglés", url: "https://www.healthcare.gov/glossary/explanation-of-benefits/" },
 };
+
+// The date the rule text and sources were last checked against the public pages. Shown in the page footer.
+export const RULES_CHECKED = "2026-10-13";
 
 // Every sentence the cards use, by language. Keep the two lists in the same order so a missing key is obvious.
 export const STR = {
@@ -66,7 +71,12 @@ export const STR = {
     coll_why: "A debt collector has to send you a validation notice. If you dispute in writing within the 30-day window it gives, collection has to stop until they verify the debt. The three big credit bureaus say, as their own policy, that they don't report medical collections under $500 or ones that were paid, and your state may go further.",
     coll_tx: " In Texas, ask whether the hospital gave you an itemized bill before this went to collections; it was required to.",
     coll_np: " A nonprofit hospital also has limits on collection actions while a financial assistance application is open.",
-    coll_act: "Send the dispute letter, then pay nothing on this debt until it is verified.",
+    coll_act: "Send the dispute letter to the collector (not the hospital), then pay nothing on this debt until it is verified.",
+    coll_dl: "Dispute deadline (30 days from the collector's first notice)",
+    coll_late: " The 30 days from the collector's first notice have passed. You can still dispute in writing, but the collector is no longer required to pause collection while it checks.",
+    eob_t: "Check the bill against your insurance statement (EOB)",
+    eob_why: "After each claim your insurer sends an Explanation of Benefits. It is not a bill. It shows what the provider charged, what your plan allowed and paid, and what you owe. The provider's bill should not ask for more than the EOB says you owe.",
+    eob_act: "Put the bill next to the EOB. If the bill is higher, or the EOB has not arrived yet, call the billing office and your plan before you pay, and ask for a corrected bill.",
     dup: (n) => `Same item, date and amount as line ${n}. Ask whether you received it twice.`,
     dup_ask: (n) => `this charge is identical to line ${n} (same item, date and amount). Please confirm whether it was billed twice and remove it if so.`,
     qty: (q) => `Quantity ${q}. Some items are correctly billed in multiples; ask what each unit was and whether you received that many.`,
@@ -115,7 +125,12 @@ export const STR = {
     coll_why: "Una agencia de cobro debe enviarle un aviso de validación. Si usted disputa por escrito dentro de los 30 días que indica, la cobranza debe detenerse hasta que verifiquen la deuda. Las tres grandes agencias de crédito dicen, como política propia, que no reportan cobranzas médicas menores de $500 ni las que ya se pagaron, y su estado puede ir más lejos.",
     coll_tx: " En Texas, pregunte si el hospital le dio una factura detallada antes de mandar la cuenta a cobranza; estaba obligado a hacerlo.",
     coll_np: " Un hospital sin fines de lucro también tiene límites en las acciones de cobro mientras una solicitud de asistencia financiera está abierta.",
-    coll_act: "Envíe la carta de disputa y no pague nada de esta deuda hasta que la verifiquen.",
+    coll_act: "Envíe la carta de disputa a la agencia de cobro (no al hospital) y no pague nada de esta deuda hasta que la verifiquen.",
+    coll_dl: "Fecha límite para disputar (30 días desde el primer aviso de la agencia de cobro)",
+    coll_late: " Ya pasaron los 30 días desde el primer aviso de la agencia de cobro. Aún puede disputar por escrito, pero la agencia ya no está obligada a detener el cobro mientras verifica.",
+    eob_t: "Compare la factura con su estado de cuenta del seguro (EOB)",
+    eob_why: "Después de cada reclamación, su aseguradora le envía una Explicación de beneficios (EOB). No es una factura. Muestra lo que cobró el proveedor, lo que su plan permitió y pagó, y lo que usted debe. La factura del proveedor no debe pedirle más de lo que dice la EOB.",
+    eob_act: "Ponga la factura junto a la EOB. Si la factura es mayor, o la EOB aún no llega, llame a la oficina de facturación y a su plan antes de pagar, y pida una factura corregida.",
     dup: (n) => `Mismo artículo, fecha y monto que la línea ${n}. Pregunte si lo recibió dos veces.`,
     dup_ask: (n) => `this charge is identical to line ${n} (same item, date and amount). Please confirm whether it was billed twice and remove it if so.`,
     qty: (q) => `Cantidad ${q}. Algunos artículos se cobran correctamente en múltiplos; pregunte qué fue cada unidad y si recibió esa cantidad.`,
@@ -154,10 +169,87 @@ export function daysLeft(iso, today) {
   return Math.round((new Date(iso + "T12:00:00") - new Date(today + "T12:00:00")) / DAY);
 }
 
+const ISO = /^\d{4}-\d{2}-\d{2}$/;
+export function isIsoDate(iso) {
+  if (!ISO.test(iso || "")) return false;
+  const d = new Date(iso + "T12:00:00");
+  return !isNaN(d) && d.toISOString().slice(0, 10) === iso;
+}
+
+/** One date field. issue is "" (fine or blank), "bad_date" (not a real date) or "future_date" (after today). value is "" unless usable. */
+export function checkDate(iso, today) {
+  const v = (iso || "").trim();
+  if (!v) return { value: "", issue: "" };
+  if (!isIsoDate(v)) return { value: "", issue: "bad_date" };
+  if (v > today) return { value: "", issue: "future_date" };
+  return { value: v, issue: "" };
+}
+
+/** Bill date and amount. A bad or future date is dropped (no deadlines), a blank amount counts as 0 and is flagged once there is a date. */
+export function validateBill({ amount, billDate }, today) {
+  const d = checkDate(billDate, today);
+  const amt = Number(amount) > 0 ? Number(amount) : 0;
+  const issues = d.issue ? [d.issue] : [];
+  if (d.value && !amt) issues.push("blank_amount");
+  return { billDate: d.value, amount: amt, issues };
+}
+
+/** The day to follow up after sending a letter: 30 days out. */
+export const followUpDate = (today) => addDays(today, 30);
+
+/** True when a card's countdown should be red. Soft deadlines never are. A card may set urgentAt (days); the default is 30. */
+export const isUrgent = (r) => r.daysLeft !== null && r.daysLeft !== undefined && !r.soft && r.daysLeft <= (r.urgentAt ?? 30);
+
+/** Lowercase, accents and punctuation stripped, whitespace collapsed: "Methodist Hospital  Stone Oak" matches "methodist hospital stone oak". */
+export function normText(s) {
+  return String(s ?? "").normalize("NFKD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+}
+
+/** hospitals = [[name, city, kind, phone], ...]. Up to max matches, best first: exact, name starts with the text, contains it, every word appears. */
+export function matchHospitals(hospitals, query, max = 8) {
+  const q = normText(query);
+  if (!q) return [];
+  const words = q.split(" ");
+  const scored = [];
+  for (const h of hospitals) {
+    const name = normText(h[0]), full = normText(`${h[0]} ${h[1]}`);
+    let score = 0;
+    if (full === q || name === q) score = 4;
+    else if (name.startsWith(q)) score = 3;
+    else if (full.includes(q)) score = 2;
+    else if (words.every((w) => full.includes(w))) score = 1;
+    if (score) scored.push([score, h]);
+  }
+  return scored.sort((a, b) => b[0] - a[0]).slice(0, max).map((x) => x[1]);
+}
+
+/** The one hospital the text names exactly ("Name (City)" from the list, or a name that is unique in the state), else null. */
+export function exactHospital(hospitals, query) {
+  const q = normText(query);
+  if (!q) return null;
+  const full = hospitals.filter((h) => normText(`${h[0]} ${h[1]}`) === q);
+  if (full.length === 1) return full[0];
+  const byName = hospitals.filter((h) => normText(h[0]) === q);
+  return byName.length === 1 ? byName[0] : null;
+}
+
+/** Line-table dates: "9/1", "09/01", "9-1", "9/1/26", "2026-09-01" compare equal when they mean the same day. Anything else is compared trimmed and lowercase. */
+export function normalizeLineDate(s) {
+  const t = String(s ?? "").trim();
+  let m = t.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+  if (m) return `${m[2].padStart(2, "0")}/${m[3].padStart(2, "0")}/${m[1]}`;
+  m = t.match(/^(\d{1,2})[\/.-](\d{1,2})(?:[\/.-](\d{2}|\d{4}))?$/);
+  if (m) {
+    const y = m[3] ? (m[3].length === 2 ? "20" + m[3] : m[3]) : "";
+    return `${m[1].padStart(2, "0")}/${m[2].padStart(2, "0")}${y ? "/" + y : ""}`;
+  }
+  return t.toLowerCase();
+}
+
 /**
  * a = { state, setting: "hospital"|"er"|"doctor"|"other", insured: bool, amount: number, billDate: "YYYY-MM-DD"|"",
  *       itemized: bool, nonprofit: "yes"|"no"|"government"|"unsure", gfe: bool, gfeAmount: number, gfeEarly: bool,
- *       surprise: "yes"|"no"|"unsure", denied: bool, collections: bool }
+ *       surprise: "yes"|"no"|"unsure", denied: bool, collections: bool, collectorNotice: "YYYY-MM-DD"|"" (collector's first notice) }
  * returns rights sorted: open hard deadlines soonest first, then the rest. `soft` deadlines are federal floors that
  * never bar applying, so the UI must not print "missed" for them.
  */
@@ -204,7 +296,7 @@ export function rightsFor(a, today = new Date().toISOString().slice(0, 10), lang
   }
 
   const over = a.amount - (a.gfeAmount || 0);
-  if (!a.insured && a.gfe && over >= 400) {
+  if (!a.insured && a.gfe && (a.gfeAmount || 0) > 0 && over >= 400) {   // a blank estimate is not a $0 estimate
     const ok = a.gfeEarly !== false;
     out.push({
       id: "gfe", letter: "gfe", priority: 0,
@@ -227,13 +319,21 @@ export function rightsFor(a, today = new Date().toISOString().slice(0, 10), lang
   }
 
   if (a.collections) {
+    // the 30-day validation window runs from the collector's first notice, not from the bill date
+    const notice = a.collectorNotice && isIsoDate(a.collectorNotice) && a.collectorNotice <= today ? a.collectorNotice : null;
+    const noticeEnd = notice ? addDays(notice, 30) : null;
     out.push({
       id: "collections", letter: "validation", priority: 0,
       title: t.coll_t,
-      why: t.coll_why + (tx ? t.coll_tx : "") + (hospital && a.nonprofit !== "no" ? t.coll_np : ""),
+      why: t.coll_why + (tx ? t.coll_tx : "") + (hospital && a.nonprofit !== "no" ? t.coll_np : "") + (noticeEnd && daysLeft(noticeEnd, today) < 0 ? t.coll_late : ""),
       action: t.coll_act,
-      deadline: null, sources: [SOURCES.fdcpa].concat(hospital && a.nonprofit !== "no" ? [SOURCES.eca] : []),
+      deadline: noticeEnd, deadlineLabel: t.coll_dl, urgentAt: 7,
+      sources: [SOURCES.fdcpa].concat(hospital && a.nonprofit !== "no" ? [SOURCES.eca] : []),
     });
+  }
+
+  if (a.insured && !a.denied && a.surprise === "no") {
+    out.push({ id: "eob", letter: null, priority: 3, title: t.eob_t, why: t.eob_why, action: t.eob_act, deadline: null, sources: [lang === "es" ? SOURCES.eob_es : SOURCES.eob] });
   }
 
   for (const r of out) r.daysLeft = r.deadline ? daysLeft(r.deadline, today) : null;
@@ -249,7 +349,7 @@ export function checkLines(lines, lang = "en") {
   const seen = new Map(), findings = [];
   const total = lines.reduce((s, l) => s + (Number(l.amount) || 0), 0);
   lines.forEach((l, i) => {
-    const key = [l.date, (l.code || "").trim().toUpperCase(), (l.desc || "").trim().toLowerCase(), Number(l.amount)].join("|");
+    const key = [normalizeLineDate(l.date), (l.code || "").trim().toUpperCase(), (l.desc || "").trim().toLowerCase(), Number(l.amount)].join("|");
     if (seen.has(key)) findings.push({ line: i, kind: "duplicate", note: t.dup(seen.get(key) + 1), ask: t.dup_ask(seen.get(key) + 1) });
     else seen.set(key, i);
     if (Number(l.qty) > 1) findings.push({ line: i, kind: "quantity", note: t.qty(l.qty), ask: t.qty_ask(l.qty) });

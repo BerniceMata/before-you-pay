@@ -29,7 +29,8 @@
   h1 em { font-style:normal; background:linear-gradient(transparent 58%, var(--hi) 58%); }
   .sub { font-size:1.12rem; max-width:40rem; margin:0; color:var(--ink); }
   .trust { display:flex; gap:.5rem; flex-wrap:wrap; }
-  .trust span { font:500 .78rem/1 "JetBrains Mono", monospace; background:var(--paper); border:1px solid var(--line); border-radius:999px; padding:.45rem .7rem; }
+  .trust span { font:500 .78rem/1.35 "JetBrains Mono", monospace; background:var(--paper); border:1px solid var(--line); border-radius:14px; padding:.45rem .7rem; }
+  .ready { margin:0 0 14px; padding:.7rem .9rem; background:var(--paper); border-left:4px solid var(--hi); border-radius:4px; font-size:.95rem; }
   .grid { display:grid; grid-template-columns: minmax(0,1fr) minmax(0,1.15fr); gap:18px; align-items:start; }
   @media (max-width:900px) { .grid { grid-template-columns:1fr; } }
   .receipt { background:var(--paper); border-radius:4px; padding:1.3rem 1.2rem 1.6rem; position:relative; box-shadow:0 1px 0 var(--line), 0 18px 40px -28px rgba(0,0,0,.35); }
@@ -45,6 +46,16 @@
   input[type=number], input[type=date], input[type=text], select, textarea { width:100%; font:500 16px "JetBrains Mono", monospace; color:var(--ink); background:var(--chip);
     border:1.5px solid var(--line); border-radius:8px; padding:.55rem .65rem; }
   .hint { font-size:.8rem; color:var(--muted); margin-top:.3rem; }
+  .hint.warn { color:var(--red); font-weight:600; }
+  .hint.warn:empty { display:none; }
+  .sub2 { margin-top:.6rem; }
+  .sub2 label { display:grid; gap:.2rem; font-size:.85rem; margin-top:.4rem; }
+  .hosp-results { list-style:none; margin:.4rem 0 0; padding:0; border:1.5px solid var(--line); border-radius:8px; overflow:hidden; background:var(--chip); }
+  .hosp-results:empty { display:none; }
+  .hosp-results li + li { border-top:1px dashed var(--line); }
+  .hosp-results button { display:block; width:100%; min-height:44px; text-align:left; font:500 .85rem/1.3 Archivo, sans-serif; background:transparent; color:var(--ink); border:0; padding:.55rem .7rem; cursor:pointer; }
+  .hosp-results button:hover, .hosp-results button:focus-visible { background:var(--hi); }
+  .hosp-results small { display:block; color:var(--muted); }
   .results h2 { font-weight:800; font-size:1.5rem; margin:.2rem 0 1rem; letter-spacing:-.01em; }
   .card { background:var(--paper); border-radius:4px; padding:1rem 1.1rem; margin-bottom:12px; border-left:5px solid var(--green); }
   .card.urgent { border-left-color:var(--red); }
@@ -74,10 +85,40 @@
   .section h2 { font-weight:800; font-size:1.5rem; margin:0 0 .4rem; }
   .fine { font-size:.8rem; color:var(--muted); max-width:52rem; }
   .topbar { display:flex; justify-content:space-between; align-items:center; gap:1rem; flex-wrap:wrap; }
-  .lang button { font:600 .78rem "JetBrains Mono", monospace; background:transparent; border:1.5px solid var(--line); color:var(--ink); border-radius:999px; padding:.35rem .7rem; cursor:pointer; margin-left:4px; }
+  .lang button { font:600 .78rem "JetBrains Mono", monospace; background:transparent; border:1.5px solid var(--line); color:var(--ink); border-radius:999px; padding:.35rem .7rem; cursor:pointer; margin-left:4px; min-height:44px; min-width:44px; }
   .lang button[aria-pressed="true"] { background:var(--ink); color:var(--paper); border-color:var(--ink); }
   .esnote { background:var(--chip); border-left:4px solid var(--green); padding:.6rem .8rem; font-size:.84rem; margin:.6rem 1rem 0; }
   .empty { color:var(--muted); font-size:.95rem; }
+  .btn.del { margin:0; padding:.25rem .5rem; min-width:44px; min-height:44px; }
+  .next { margin:0 1rem 1rem; padding:.8rem 1rem; background:var(--chip); border-left:4px solid var(--green); border-radius:4px; font-size:.9rem; }
+  .next h3 { margin:0 0 .4rem; font-size:1rem; }
+  .next ul { margin:0; padding-left:1.2rem; }
+  .next li { margin:.2rem 0; }
+  footer.foot { margin-top:2.4rem; padding-top:1rem; border-top:1px dashed var(--line); }
+  footer.foot p { margin:.25rem 0; }
+  footer.foot a { color:var(--muted); }
+  .jump { display:none; }
+  @media (max-width:900px) {
+    .jump:not([hidden]) { display:block; position:fixed; left:12px; right:12px; bottom:12px; z-index:5; min-height:48px; font:700 .95rem Archivo, sans-serif; text-align:center;
+      background:var(--ink); color:var(--paper); border:0; border-radius:10px; padding:.75rem 1rem; box-shadow:0 8px 24px rgba(0,0,0,.3); cursor:pointer; }
+    .wrap { padding-block-end:6rem; }
+  }
+  @media (max-width:760px) {
+    .dlg .bar { position:sticky; bottom:0; z-index:2; background:var(--paper); box-shadow:0 -6px 12px -8px rgba(0,0,0,.25); }
+    .dlg .bar .btn { margin-top:0; min-height:44px; }
+    .dlg pre { max-height:none; overflow:visible; }
+  }
+  /* Print: only the letter, black on white. The body gets .letter-open while the letter dialog is open, so printing the bare page is unchanged. */
+  @media print {
+    @page { margin:2cm; }
+    body.letter-open { background:#fff; color:#000; }
+    body.letter-open .wrap, body.letter-open .jump { display:none !important; }
+    body.letter-open dialog[open] { display:block; position:static; inset:auto; width:auto; max-width:none; height:auto; max-height:none; overflow:visible; margin:0; padding:0; border:0; background:#fff; color:#000; }
+    body.letter-open dialog::backdrop { display:none; background:none; }
+    body.letter-open .dlg { display:block; }
+    body.letter-open .dlg aside, body.letter-open .dlg .bar, body.letter-open .esnote, body.letter-open .next { display:none !important; }
+    body.letter-open #letterText { max-height:none; overflow:visible; padding:0; background:#fff; color:#000; font:12pt/1.5 Georgia, "Times New Roman", serif; white-space:pre-wrap; }
+  }
 </style>
 </head>
 <body>
@@ -86,30 +127,39 @@
     <div class="topbar"><div class="tag">Before You Pay &middot; free &middot; no signup</div><div class="lang" role="group" aria-label="Language"><button type="button" data-lang="en" aria-pressed="true">English</button><button type="button" data-lang="es">Español</button></div></div>
     <h1 id="h1"><span data-s="h1a">Before you pay that</span> <em data-s="h1b">medical bill</em>.</h1>
     <p class="sub">Answer a few questions. See which federal patient rights apply to you, how many days you have left, and get the letter to send.</p>
-    <div class="trust"><span>Nothing you type leaves this page</span><span>Every right cites its source</span><span>Self-help, not legal advice</span></div>
+    <div class="trust"><span>Nothing you type leaves this page; we count anonymous page events, never answers</span><span>Every right cites its source</span><span>Self-help, not legal advice</span></div>
   </header>
+
+  <p class="ready"><b>Have these ready:</b> <span>the bill, the insurance statement (EOB) if any, any estimate you were given.</span></p>
 
   <div class="grid">
     <form class="receipt" id="f" onsubmit="return false">
-      <div class="q"><span class="ql">Where was the care?</span><div class="seg" data-k="setting"><button type="button" data-v="hospital">Hospital stay or surgery</button><button type="button" data-v="er">Emergency room</button><button type="button" data-v="doctor">Doctor or clinic</button><button type="button" data-v="other">Lab, imaging, other</button></div></div>
-      <div class="q"><span class="ql">Did insurance cover any of it?</span><div class="seg" data-k="insured"><button type="button" data-v="true">Yes, I have insurance</button><button type="button" data-v="false">No, uninsured or self-pay</button></div></div>
-      <div class="q"><div class="row2"><label>Bill amount ($)<input id="amount" type="number" min="0" step="1" placeholder="0"></label><label>Date on the first bill<input id="billDate" type="date"></label></div><div class="hint">Deadlines count from the bill date.</div></div>
-      <div class="q" data-show="uninsured"><span class="ql">Did you get a written estimate (Good Faith Estimate)?</span><div class="seg" data-k="gfe"><button type="button" data-v="true">Yes</button><button type="button" data-v="false">No</button></div>
+      <div class="q" role="group" aria-labelledby="ql-setting"><span class="ql" id="ql-setting">Where was the care?</span><div class="seg" data-k="setting"><button type="button" data-v="hospital">Hospital stay or surgery</button><button type="button" data-v="er">Emergency room</button><button type="button" data-v="doctor">Doctor or clinic</button><button type="button" data-v="other">Lab, imaging, other</button></div></div>
+      <div class="q" role="group" aria-labelledby="ql-insured"><span class="ql" id="ql-insured">Did insurance cover any of it?</span><div class="seg" data-k="insured"><button type="button" data-v="true">Yes, I have insurance</button><button type="button" data-v="false">No, uninsured or self-pay</button></div></div>
+      <div class="q" role="group" aria-labelledby="ql-amount ql-billdate"><div class="row2"><label><span id="ql-amount">Bill amount ($)</span><input id="amount" type="number" min="0" step="1" placeholder="0"></label><label><span id="ql-billdate">Date on the first bill</span><input id="billDate" type="date"></label></div><div class="hint">Deadlines count from the bill date.</div><div class="hint">The date printed on the first bill you got for this care, not the date of the care.</div><div class="hint warn" id="billMsg" aria-live="polite"></div></div>
+      <div class="q" data-show="uninsured" role="group" aria-labelledby="ql-gfe"><span class="ql" id="ql-gfe">Did you get a written estimate (Good Faith Estimate)?</span><div class="hint">A Good Faith Estimate is a written price estimate a provider must give uninsured or self-pay patients before scheduled care.</div><div class="seg" data-k="gfe"><button type="button" data-v="true">Yes</button><button type="button" data-v="false">No</button></div>
         <label style="margin-top:.5rem;font-weight:400" data-show="gfe">Estimate amount from this provider ($)<input id="gfeAmount" type="number" min="0" step="1" placeholder="0"></label>
         <div data-show="gfe" style="margin-top:.6rem"><span class="ql" style="font-weight:600">Did you get the estimate at least 3 business days before the care?</span><div class="seg" data-k="gfeEarly"><button type="button" data-v="true">Yes</button><button type="button" data-v="false">No, or not sure</button></div><div class="hint">The dispute compares one provider's bill with that same provider's estimate.</div></div></div>
-      <div class="q" data-show="insured"><span class="ql">Was it an emergency, or an out-of-network doctor at an in-network hospital?</span><div class="seg" data-k="surprise"><button type="button" data-v="yes">Yes</button><button type="button" data-v="no">No</button><button type="button" data-v="unsure">Not sure</button></div></div>
-      <div class="q" data-show="insured"><span class="ql">Did your insurance deny the claim?</span><div class="seg" data-k="denied"><button type="button" data-v="true">Yes</button><button type="button" data-v="false">No</button></div></div>
-      <div class="q" data-show="hospital"><label>Hospital name<input id="hospital" type="text" list="hospList" autocomplete="off" placeholder="Start typing, pick from the list"><datalist id="hospList"></datalist></label><div class="hint" id="hospHint">We look it up in the CMS hospital list for your state (loaded on this page, nothing is sent).</div></div>
-      <div class="q" data-show="hospital"><span class="ql">Is the hospital a nonprofit?</span><div class="seg" data-k="nonprofit"><button type="button" data-v="yes">Yes</button><button type="button" data-v="no">No, for-profit</button><button type="button" data-v="government">Public / government</button><button type="button" data-v="unsure">Not sure</button></div><div class="hint">Picking the hospital above answers this for you. Otherwise, most US hospitals are nonprofits.</div></div>
-      <div class="q"><span class="ql">Do you have the itemized bill (every line and code)?</span><div class="seg" data-k="itemized"><button type="button" data-v="true">Yes</button><button type="button" data-v="false">No, just a total</button></div></div>
-      <div class="q"><span class="ql">Has it gone to collections?</span><div class="seg" data-k="collections"><button type="button" data-v="true">Yes</button><button type="button" data-v="false">No</button></div></div>
-      <div class="q"><label>State<select id="state"></select></label></div>
+      <div class="q" data-show="insured" role="group" aria-labelledby="ql-surprise"><span class="ql" id="ql-surprise">Was it an emergency, or an out-of-network doctor at an in-network hospital?</span><div class="seg" data-k="surprise"><button type="button" data-v="yes">Yes</button><button type="button" data-v="no">No</button><button type="button" data-v="unsure">Not sure</button></div></div>
+      <div class="q" data-show="insured" role="group" aria-labelledby="ql-denied"><span class="ql" id="ql-denied">Did your insurance deny the claim?</span><div class="seg" data-k="denied"><button type="button" data-v="true">Yes</button><button type="button" data-v="false">No</button></div></div>
+      <div class="q" data-show="hospital" role="group" aria-labelledby="ql-hospital"><label><span id="ql-hospital">Hospital name</span><input id="hospital" type="text" list="hospList" autocomplete="off" placeholder="Start typing, pick from the list"><datalist id="hospList"></datalist></label><ul class="hosp-results" id="hospResults" aria-label="Matching hospitals"></ul><div class="hint" id="hospHint">We look it up in the CMS hospital list for your state (loaded on this page, nothing is sent).</div></div>
+      <div class="q" data-show="hospital" role="group" aria-labelledby="ql-nonprofit"><span class="ql" id="ql-nonprofit">Is the hospital a nonprofit?</span><div class="seg" data-k="nonprofit"><button type="button" data-v="yes">Yes</button><button type="button" data-v="no">No, for-profit</button><button type="button" data-v="government">Public / government</button><button type="button" data-v="unsure">Not sure</button></div><div class="hint">Picking the hospital above answers this for you. Otherwise, most US hospitals are nonprofits.</div></div>
+      <div class="q" role="group" aria-labelledby="ql-itemized"><span class="ql" id="ql-itemized">Do you have the itemized bill (every line and code)?</span><div class="hint">An itemized bill lists every service, its billing code and its charge, not just one total.</div><div class="seg" data-k="itemized"><button type="button" data-v="true">Yes</button><button type="button" data-v="false">No, just a total</button></div></div>
+      <div class="q" role="group" aria-labelledby="ql-collections"><span class="ql" id="ql-collections">Has it gone to collections?</span><div class="hint">Collections means the provider handed the bill to a debt collector, and now the collector is the one writing to you.</div><div class="seg" data-k="collections"><button type="button" data-v="true">Yes</button><button type="button" data-v="false">No</button></div>
+        <div class="sub2" data-show="collections">
+          <label>Collector's name<input id="collName" type="text" autocomplete="off"></label>
+          <label>Collector's address<input id="collAddr" type="text" autocomplete="off"></label>
+          <label>Date of the collector's first notice<input id="collNotice" type="date"></label>
+          <div class="hint">The 30 days to dispute start on the date of the collector's first notice, not the hospital's bill.</div>
+          <div class="hint warn" id="collMsg" aria-live="polite"></div>
+        </div></div>
+      <div class="q" role="group" aria-labelledby="ql-state"><label><span id="ql-state">State</span><select id="state"></select></label></div>
     </form>
 
     <div class="results">
-      <div class="tag" id="count"></div>
+      <div class="tag" id="count" aria-live="polite"></div>
       <h2>Your rights, most urgent first</h2>
-      <div id="rights"></div>
+      <div id="rights" tabindex="-1"></div>
     </div>
   </div>
 
@@ -127,22 +177,30 @@
     <h2>What this is</h2>
     <p class="fine" id="about">Before You Pay turns public rules into plain steps: the IRS rules for nonprofit hospital financial assistance (Section 501(r)), the No Surprises Act and its Good Faith Estimate dispute, your HIPAA right to your billing records, Texas law on itemized bills, state charity-care laws, and the CFPB's debt dispute guidance. It doesn't store, send or see anything you enter. It's self-help information, not legal or financial advice. For a large or complex bill, talk to a patient advocate or an attorney. Built by <a href="/work">Mitchell Nicholas</a>, former medical assistant.</p>
   </section>
+
+  <footer class="foot fine">
+    <p id="rulesChecked"></p>
+    <p><span>Report a wrong rule:</span> <a href="mailto:support@mitchloveswords.com">support@mitchloveswords.com</a></p>
+  </footer>
 </div>
+
+<button type="button" class="jump" id="jump" hidden></button>
 
 <dialog id="dlg">
   <div class="dlg">
     <aside id="fields"></aside>
-    <div><div class="esnote" id="esnote" hidden></div><pre id="letterText"></pre></div>
+    <div><div class="esnote" id="esnote" hidden></div><pre id="letterText"></pre><div class="next" id="next" aria-live="polite" hidden></div></div>
     <div class="bar"><button class="btn" id="copyBtn" type="button">Copy letter</button><button class="btn ghost" id="dlBtn" type="button">Download .txt</button><button class="btn ghost" id="printBtn" type="button">Print</button><button class="btn ghost" id="closeBtn" type="button">Close</button><span class="hint" id="copied"></span></div>
   </div>
 </dialog>
 
 <script type="module">
-import { rightsFor, checkLines, SOURCES } from "./rules.js";
+import { rightsFor, checkLines, SOURCES, RULES_CHECKED, validateBill, checkDate, followUpDate, isUrgent, normText, matchHospitals, exactHospital } from "./rules.js";
 import { letter, LETTER_NAMES } from "./letters.js";
 
 const STATES = "AL AK AZ AR CA CO CT DE DC FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS MO MT NE NV NH NJ NM NY NC ND OH OK OR PA RI SC SD TN TX UT VT VA WA WV WI WY".split(" ");
-const today = new Date().toISOString().slice(0, 10);
+// today in the visitor's own time zone, so "future date" and the 30-day math do not flip a day early in the evening
+const todayIso = () => new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
 const A = { setting: "hospital", insured: false, gfe: true, gfeEarly: true, surprise: "unsure", denied: false, nonprofit: "unsure", itemized: false, collections: false, state: "TX" };
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -154,7 +212,7 @@ if (lang !== "es") lang = "en";
 const T = {
   "Before You Pay · free · no signup": "Before You Pay · gratis · sin registro",
   "Answer a few questions. See which federal patient rights apply to you, how many days you have left, and get the letter to send.": "Responda unas preguntas. Vea qué derechos federales del paciente le aplican, cuántos días le quedan, y obtenga la carta para enviar.",
-  "Nothing you type leaves this page": "Nada de lo que escribe sale de esta página", "Every right cites its source": "Cada derecho cita su fuente", "Self-help, not legal advice": "Autoayuda, no asesoría legal",
+  "Nothing you type leaves this page; we count anonymous page events, never answers": "Nada de lo que escribe sale de esta página; contamos eventos anónimos de la página, nunca respuestas", "Every right cites its source": "Cada derecho cita su fuente", "Self-help, not legal advice": "Autoayuda, no asesoría legal",
   "Where was the care?": "¿Dónde fue la atención?", "Hospital stay or surgery": "Hospitalización o cirugía", "Emergency room": "Sala de emergencias", "Doctor or clinic": "Médico o clínica", "Lab, imaging, other": "Laboratorio, imágenes, otro",
   "Did insurance cover any of it?": "¿El seguro cubrió algo?", "Yes, I have insurance": "Sí, tengo seguro", "No, uninsured or self-pay": "No, sin seguro o pago directo",
   "Bill amount ($)": "Monto de la factura ($)", "Date on the first bill": "Fecha de la primera factura", "Deadlines count from the bill date.": "Los plazos se cuentan desde la fecha de la factura.",
@@ -171,6 +229,14 @@ const T = {
   "Check the itemized bill, line by line": "Revise la factura detallada, línea por línea",
   "Type the lines from your itemized bill. It flags exact repeats, quantities above one, and any single line that is most of the bill, then puts the ones you pick into a dispute letter. It runs on your device only.": "Escriba las líneas de su factura detallada. Marca repeticiones exactas, cantidades mayores a uno, y cualquier línea que sea la mayor parte de la factura, y luego pone las que usted elija en una carta de disputa. Funciona solo en su dispositivo.",
   "Date": "Fecha", "Code": "Código", "Description": "Descripción", "Qty": "Cant.", "+ Add line": "+ Agregar línea", "What this is": "Qué es esto",
+  "Have these ready:": "Tenga esto a la mano:", "the bill, the insurance statement (EOB) if any, any estimate you were given.": "la factura, el estado de cuenta del seguro (EOB) si lo tiene, y cualquier estimación que le hayan dado.",
+  "The date printed on the first bill you got for this care, not the date of the care.": "La fecha impresa en la primera factura que recibió por esta atención, no la fecha de la atención.",
+  "A Good Faith Estimate is a written price estimate a provider must give uninsured or self-pay patients before scheduled care.": "Una estimación de buena fe es un precio estimado por escrito que el proveedor debe dar a los pacientes sin seguro o que pagan por su cuenta antes de una atención programada.",
+  "An itemized bill lists every service, its billing code and its charge, not just one total.": "Una factura detallada enumera cada servicio, su código de facturación y su cargo, no solo un total.",
+  "Collections means the provider handed the bill to a debt collector, and now the collector is the one writing to you.": "Cobranza significa que el proveedor pasó la factura a una agencia de cobro de deudas, y ahora quien le escribe es la agencia.",
+  "Collector's name": "Nombre de la agencia de cobro", "Collector's address": "Dirección de la agencia de cobro", "Date of the collector's first notice": "Fecha del primer aviso de la agencia de cobro",
+  "The 30 days to dispute start on the date of the collector's first notice, not the hospital's bill.": "Los 30 días para disputar empiezan en la fecha del primer aviso de la agencia de cobro, no en la factura del hospital.",
+  "Report a wrong rule:": "Reportar una regla incorrecta:",
   "Copy letter": "Copiar carta", "Download .txt": "Descargar .txt", "Print": "Imprimir", "Close": "Cerrar",
 };
 const UI = {
@@ -180,8 +246,18 @@ const UI = {
     hospHint: "We look it up in the CMS hospital list for your state (loaded on this page, nothing is sent).",
     matched: (h, c, k, p) => `${h}, ${c}: listed as <b>${k}</b> in the <a href="https://data.cms.gov/provider-data/dataset/xubh-q36u" target="_blank" rel="noopener">CMS hospital list</a>. Billing office: ${p}.`,
     kinds: { nonprofit: "nonprofit", "for-profit": "for-profit", government: "government" },
-    fields: { name: "Your full name", address: "Your mailing address", provider: "Hospital or provider", providerAddress: "Billing address (from the bill)", account: "Account number", serviceDate: "Date(s) of service", patient: "Patient name (if not you)" },
+    fields: { name: "Your full name", address: "Your mailing address", provider: "Hospital or provider", providerAddress: "Billing address (from the bill)", account: "Account number", serviceDate: "Date(s) of service", patient: "Patient name (if not you)",
+      collector: "Collection agency name", collectorAddress: "Collection agency address", collectorNotice: "Date of the collector's first notice" },
     stays: "Stays on this device. Send it by certified mail or the provider's portal, and keep a copy.", copied: "Copied.", selected: "Selected: press Ctrl+C.",
+    seeThem: (n) => `${n} right${n === 1 ? " applies, see it" : "s apply, see them"}`,
+    emptyPrompt: "Enter the date on the first bill (and the bill amount) to see your rights and deadlines.",
+    billFuture: "That date is in the future. Enter the date printed on the first bill.", billBad: "That is not a date we can read. Enter the date printed on the first bill.",
+    amountBlank: "No bill amount entered, so we are counting it as $0. The estimate dispute needs the amount.",
+    noticeFuture: "That date is in the future. Enter the date on the collector's first notice.", noticeBad: "That is not a date we can read. Enter the date on the collector's first notice.",
+    hospNone: "No match in the CMS list for your state. Answer the question below.",
+    creditor: "Original creditor (hospital or provider)",
+    rulesChecked: (d) => `Rules last checked ${d}`,
+    next: (when) => `<h3>What happens next</h3><ul><li>Send it by certified mail (ask for a return receipt) or through the provider's portal. Keep a copy and the receipt.</li><li>Expect a written reply in about 30 days.</li><li>Follow up on <b>${when}</b> if you have not heard back.</li><li>If there is still no reply, call the CMS help line: 1-800-985-3059.</li></ul>`,
     twoLines: "Add at least two lines to check.", total: "Total entered:", line: "Line", toDispute: "Put checked lines in a dispute letter",
     noFlags: "No exact repeats or quantity flags. Still check each line for anything you didn't receive, and ask for the hospital's posted cash price on the biggest items.",
     about: null, esnote: null },
@@ -191,8 +267,18 @@ const UI = {
     hospHint: "Lo buscamos en la lista de hospitales de CMS de su estado (cargada en esta página, no se envía nada).",
     matched: (h, c, k, p) => `${h}, ${c}: aparece como <b>${k}</b> en la <a href="https://data.cms.gov/provider-data/dataset/xubh-q36u" target="_blank" rel="noopener">lista de hospitales de CMS</a>. Oficina de facturación: ${p}.`,
     kinds: { nonprofit: "sin fines de lucro", "for-profit": "con fines de lucro", government: "público" },
-    fields: { name: "Su nombre completo", address: "Su dirección postal", provider: "Hospital o proveedor", providerAddress: "Dirección de facturación (de la factura)", account: "Número de cuenta", serviceDate: "Fecha(s) de servicio", patient: "Nombre del paciente (si no es usted)" },
+    fields: { name: "Su nombre completo", address: "Su dirección postal", provider: "Hospital o proveedor", providerAddress: "Dirección de facturación (de la factura)", account: "Número de cuenta", serviceDate: "Fecha(s) de servicio", patient: "Nombre del paciente (si no es usted)",
+      collector: "Nombre de la agencia de cobro", collectorAddress: "Dirección de la agencia de cobro", collectorNotice: "Fecha del primer aviso de la agencia de cobro" },
     stays: "Se queda en su dispositivo. Envíela por correo certificado o por el portal del proveedor, y guarde una copia.", copied: "Copiado.", selected: "Seleccionado: presione Ctrl+C.",
+    seeThem: (n) => `${n} derecho${n === 1 ? " le aplica, véalo" : "s le aplican, véalos"}`,
+    emptyPrompt: "Escriba la fecha de la primera factura (y el monto) para ver sus derechos y plazos.",
+    billFuture: "Esa fecha está en el futuro. Escriba la fecha impresa en la primera factura.", billBad: "No podemos leer esa fecha. Escriba la fecha impresa en la primera factura.",
+    amountBlank: "No escribió el monto de la factura, así que lo contamos como $0. La disputa de la estimación necesita el monto.",
+    noticeFuture: "Esa fecha está en el futuro. Escriba la fecha del primer aviso de la agencia de cobro.", noticeBad: "No podemos leer esa fecha. Escriba la fecha del primer aviso de la agencia de cobro.",
+    hospNone: "No hay coincidencia en la lista de CMS de su estado. Responda la pregunta de abajo.",
+    creditor: "Acreedor original (hospital o proveedor)",
+    rulesChecked: (d) => `Reglas revisadas por última vez el ${d}`,
+    next: (when) => `<h3>Qué sigue</h3><ul><li>Envíela por correo certificado (pida acuse de recibo) o por el portal del proveedor. Guarde una copia y el recibo.</li><li>Espere una respuesta por escrito en unos 30 días.</li><li>Dé seguimiento el <b>${when}</b> si no ha recibido respuesta.</li><li>Si aún no hay respuesta, llame a la línea de ayuda de CMS: 1-800-985-3059 (atiende en español).</li></ul>`,
     twoLines: "Agregue al menos dos líneas para revisar.", total: "Total ingresado:", line: "Línea", toDispute: "Poner las líneas marcadas en una carta de disputa",
     noFlags: "No hay repeticiones exactas ni cantidades marcadas. Aun así revise cada línea por algo que no recibió, y pida el precio de contado publicado por el hospital para los artículos más grandes.",
     about: `Before You Pay convierte reglas públicas en pasos sencillos: las reglas del IRS sobre asistencia financiera en hospitales sin fines de lucro (Sección 501(r)), la Ley Sin Sorpresas y su disputa por estimación de buena fe, su derecho bajo HIPAA a sus registros de facturación, la ley de Texas sobre facturas detalladas, las leyes estatales de atención de caridad, y la guía del CFPB para disputar deudas. No guarda, envía ni ve nada de lo que usted escribe. Es información de autoayuda, no asesoría legal ni financiera. Para una factura grande o compleja, hable con un defensor del paciente o un abogado. Creado por <a href="/work">Mitchell Nicholas</a>, ex asistente médico.`,
@@ -200,7 +286,7 @@ const UI = {
       fap: "Esta carta va en inglés. Qué dice: solicita la política de asistencia financiera, el resumen en lenguaje sencillo y el formulario, pide que apliquen cualquier asistencia que le corresponda, y que detengan la cobranza mientras la revisan.",
       gfe: "Esta carta va en inglés. Qué dice: informa que la factura supera en $400 o más su estimación de buena fe, que usted está presentando la disputa federal ante CMS dentro de los 120 días, y que mientras esté pendiente no pueden mandarla a cobranza ni cobrar recargos.",
       nsa: "Esta carta va en inglés. Qué dice: explica que la atención está protegida por la Ley Sin Sorpresas y que usted solo debe su costo compartido dentro de la red; pide una factura corregida.",
-      validation: "Esta carta va en inglés. Qué dice: disputa la deuda, pide la verificación (acreedor original, detalle del monto, autorización para cobrar) y exige que detengan el cobro y no la reporten al crédito mientras esté en disputa.",
+      validation: "Esta carta va en inglés y va dirigida a la agencia de cobro, no al hospital. Qué dice: disputa la deuda, pide la verificación (acreedor original, detalle del monto, autorización para cobrar) y exige que detengan el cobro y no la reporten al crédito mientras esté en disputa.",
       errors: "Esta carta va en inglés. Qué dice: lista cada cargo que usted disputa y por qué, y pide una factura corregida y una explicación de cualquier cargo que mantengan." } },
 };
 const u = () => UI[lang];
@@ -220,9 +306,10 @@ function applyLang() {
   document.querySelector("[data-s=h1a]").textContent = u().h1a; document.querySelector("[data-s=h1b]").textContent = u().h1b;
   if (!EN.has($("about"))) EN.set($("about"), $("about").innerHTML);
   $("about").innerHTML = u().about || EN.get($("about"));
-  if ($("hospHint") && !$("hospHint").dataset.matched) $("hospHint").textContent = u().hospHint;
+  paintHospHint(); drawHospResults();
+  $("rulesChecked").textContent = u().rulesChecked(RULES_CHECKED);
 }
-document.querySelectorAll(".lang button").forEach((b) => b.addEventListener("click", () => { lang = b.dataset.lang; applyLang(); render(); runLines(); ev("lang_" + lang); }));
+document.querySelectorAll(".lang button").forEach((b) => b.addEventListener("click", () => { lang = b.dataset.lang; applyLang(); render(); runLines(); if (!$("next").hidden) showNext(); ev("lang_" + lang); }));
 
 // usage counting: one anonymous event per kind per page view, no answers or personal data
 const sent = new Set();
@@ -241,7 +328,9 @@ document.querySelectorAll(".seg").forEach((seg) => {
     ev("answered"); render();
   });
 });
-["amount", "billDate", "gfeAmount", "state"].forEach((id) => $(id).addEventListener("input", () => { ev("answered"); render(); }));
+["amount", "billDate", "gfeAmount", "state", "collNotice"].forEach((id) => $(id).addEventListener("input", () => { ev("answered"); if (id === "collNotice") setField("collectorNotice", checkDate($("collNotice").value, todayIso()).value); render(); }));
+$("collName").addEventListener("input", () => setField("collector", $("collName").value));
+$("collAddr").addEventListener("input", () => setField("collectorAddress", $("collAddr").value));
 
 // hospital lookup: CMS Hospital General Information, split per state, fetched from this site only
 let hospitals = [], hospState = "";
@@ -251,22 +340,59 @@ async function loadHospitals() {
   hospState = st; hospitals = [];
   try { hospitals = await (await fetch(`hospitals/${st}.json`)).json(); } catch (e) { hospitals = []; }
   $("hospList").innerHTML = hospitals.map((h) => `<option value="${esc(h[0])} (${esc(h[1])})"></option>`).join("");
+  if ($("hospital").value) lookupHospital();
 }
-$("state").addEventListener("change", () => { loadHospitals(); $("hospital").value = ""; delete $("hospHint").dataset.matched; $("hospHint").textContent = u().hospHint; });
-$("hospital").addEventListener("input", () => {
-  const v = $("hospital").value.trim().toLowerCase();
-  const hit = hospitals.find((h) => `${h[0]} (${h[1]})`.toLowerCase() === v);
-  if (!hit) return;
+// hospital lookup state: hospHit is the matched hospital, hospNone means 3+ characters typed and nothing in the list matched
+let hospHit = null, hospNone = false, hospMatches = [];
+function paintHospHint() {
+  const h = $("hospHint"); h.classList.toggle("warn", hospNone && !hospHit);
+  if (hospHit) h.innerHTML = u().matched(esc(hospHit[0]), esc(hospHit[1]), esc(u().kinds[hospHit[2]] || hospHit[2]), esc(hospHit[3]));
+  else h.textContent = hospNone ? u().hospNone : u().hospHint;
+}
+function drawHospResults() {
+  $("hospResults").innerHTML = hospMatches.map((h, i) => `<li><button type="button" data-hi="${i}">${esc(h[0])} (${esc(h[1])})<small>${esc(u().kinds[h[2]] || h[2])}</small></button></li>`).join("");
+}
+function chooseHospital(hit) {
+  hospHit = hit; hospNone = false; hospMatches = [];
   A.nonprofit = hit[2] === "nonprofit" ? "yes" : hit[2] === "for-profit" ? "no" : "government";
-  $("hospHint").dataset.matched = "1";
-  $("hospHint").innerHTML = u().matched(esc(hit[0]), esc(hit[1]), esc(u().kinds[hit[2]] || hit[2]), esc(hit[3]));
-  ev("hospital_matched"); render();
+  drawHospResults(); paintHospHint(); ev("hospital_matched"); render();
+}
+function lookupHospital() {
+  const q = $("hospital").value;
+  const hit = exactHospital(hospitals, q);
+  if (hit) { chooseHospital(hit); return; }
+  hospHit = null;
+  hospMatches = matchHospitals(hospitals, q, 8);
+  hospNone = normText(q).length >= 3 && hospMatches.length === 0;
+  drawHospResults(); paintHospHint();
+}
+$("state").addEventListener("change", () => { loadHospitals(); $("hospital").value = ""; hospHit = null; hospNone = false; hospMatches = []; drawHospResults(); paintHospHint(); });
+$("hospital").addEventListener("input", lookupHospital);
+$("hospResults").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-hi]"); if (!b) return;
+  const hit = hospMatches[+b.dataset.hi]; if (!hit) return;
+  $("hospital").value = `${hit[0]} (${hit[1]})`; chooseHospital(hit);
 });
 loadHospitals();
 
 function answers() {
-  return { ...A, amount: Number($("amount").value) || 0, billDate: $("billDate").value, gfeAmount: Number($("gfeAmount").value) || 0, state: $("state").value };
+  const today = todayIso(), bill = validateBill({ amount: $("amount").value, billDate: $("billDate").value }, today);
+  return { ...A, amount: bill.amount, billDate: bill.billDate, issues: bill.issues, gfeAmount: Number($("gfeAmount").value) || 0, state: $("state").value,
+    collectorNotice: checkDate($("collNotice").value, today).value };
 }
+
+// the "N rights apply, see them" bar: phones only, only while the first card is still below the screen
+function updateJump() {
+  const j = $("jump"), n = current.length;
+  const below = $("rights").getBoundingClientRect().top >= window.innerHeight;
+  j.hidden = !(n > 0 && below && matchMedia("(max-width:900px)").matches);
+  if (!j.hidden) j.textContent = u().seeThem(n);
+}
+addEventListener("scroll", updateJump, { passive: true }); addEventListener("resize", updateJump);
+$("jump").onclick = () => {
+  $("rights").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+  $("rights").focus({ preventScroll: true });
+};
 
 let current = [];
 function render() {
@@ -277,19 +403,22 @@ function render() {
   document.querySelectorAll("[data-show]").forEach((el) => {
     const k = el.dataset.show;
     el.hidden = (k === "uninsured" && A.insured) || (k === "insured" && !A.insured) || (k === "gfe" && !A.gfe) ||
-      (k === "hospital" && !(A.setting === "hospital" || A.setting === "er"));
+      (k === "collections" && !A.collections) || (k === "hospital" && !(A.setting === "hospital" || A.setting === "er"));
   });
-  const a = answers();
-  if (!a.amount || !a.billDate) {
+  const today = todayIso(), a = answers();
+  const nt = checkDate($("collNotice").value, today);
+  $("billMsg").textContent = a.issues.includes("future_date") ? u().billFuture : a.issues.includes("bad_date") ? u().billBad : a.issues.includes("blank_amount") ? u().amountBlank : "";
+  $("collMsg").textContent = nt.issue === "future_date" ? u().noticeFuture : nt.issue ? u().noticeBad : "";
+  if (!a.billDate) {
     $("count").textContent = "";
-    $("rights").innerHTML = `<p class="empty">${esc(lang === "es" ? "Escriba el monto de la factura y la fecha de la primera factura para ver sus derechos y plazos." : "Enter the bill amount and the date on the first bill to see your rights and deadlines.")}</p>`;
-    current = [];
+    $("rights").innerHTML = `<p class="empty">${esc(u().emptyPrompt)}</p>`;
+    current = []; updateJump();
     return;
   }
   current = rightsFor(a, today, lang);
   $("count").textContent = u().apply(current.length);
   $("rights").innerHTML = current.map((r, i) => {
-    const urgent = r.daysLeft !== null && r.daysLeft <= 30 && !r.soft;
+    const urgent = isUrgent(r);
     const chip = !r.deadline ? "" : r.soft
       ? `<span class="chip">${esc(r.daysLeft < 0 ? u().softPassed : u().softLeft(r.daysLeft))}</span>`
       : (r.daysLeft < 0 ? `<span class="chip red">${esc(u().passed(-r.daysLeft))}</span>`
@@ -298,12 +427,21 @@ function render() {
       ${r.letter ? `<button class="btn" type="button" data-letter="${r.letter}">${esc(u().write)}</button>` : ""}
       <p class="src">${esc(u().source)} ${r.sources.map((s) => `<a href="${s.url}" target="_blank" rel="noopener">${esc(s.label)}</a>`).join(" &middot; ")}</p></div>`;
   }).join("");
-  ev("rights_shown");
+  ev("rights_shown"); updateJump();
 }
 
 // letter editor
-const F = { name: "", address: "", provider: "", providerAddress: "", account: "", serviceDate: "", patient: "" };
+const F = { name: "", address: "", provider: "", providerAddress: "", account: "", serviceDate: "", patient: "", collector: "", collectorAddress: "", collectorNotice: "" };
+const LETTER_FIELDS = { validation: ["name", "address", "collector", "collectorAddress", "collectorNotice", "provider", "account", "serviceDate", "patient"] };
+const BASE_FIELDS = ["name", "address", "provider", "providerAddress", "account", "serviceDate", "patient"];
+const FORM_INPUT = { collector: "collName", collectorAddress: "collAddr", collectorNotice: "collNotice" };
 let openId = null, extra = {};
+// one value, two places: the collections block on the form and the letter dialog share the collector's details
+function setField(k, v) {
+  F[k] = v;
+  const box = document.querySelector(`#fields [data-f="${k}"]`); if (box && box.value !== v) box.value = v;
+  if (openId && $("dlg").open) showLetter();
+}
 function showLetter() {
   const a = answers();
   const txt = letter(openId, { ...F, state: a.state, today: new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) },
@@ -311,40 +449,52 @@ function showLetter() {
   $("letterText").textContent = txt;
   return txt;
 }
+function showNext() {
+  const when = new Date(followUpDate(todayIso()) + "T12:00:00").toLocaleDateString(lang === "es" ? "es-US" : "en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+  $("next").innerHTML = u().next(esc(when)); $("next").hidden = false;
+}
 function openLetter(id, ex = {}) {
   openId = id; extra = ex;
-  $("fields").innerHTML = `<div class="tag">${esc(LETTER_NAMES[id])}</div>` + Object.entries(u().fields).map(([k, l]) =>
-    `<label>${l}<input type="text" data-f="${k}" value="${esc(F[k])}"></label>`).join("") +
+  if (id === "validation") {
+    // start from what was typed on the form
+    F.collector = $("collName").value || F.collector; F.collectorAddress = $("collAddr").value || F.collectorAddress;
+    F.collectorNotice = checkDate($("collNotice").value, todayIso()).value || F.collectorNotice;
+  }
+  $("fields").innerHTML = `<div class="tag">${esc(LETTER_NAMES[id])}</div>` + (LETTER_FIELDS[id] || BASE_FIELDS).map((k) =>
+    `<label>${esc(k === "provider" && id === "validation" ? u().creditor : u().fields[k])}<input type="${k === "collectorNotice" ? "date" : "text"}" data-f="${k}" value="${esc(F[k])}"></label>`).join("") +
     `<p class="hint">${esc(u().stays)}</p>`;
-  $("fields").querySelectorAll("input").forEach((i) => i.addEventListener("input", () => { F[i.dataset.f] = i.value; showLetter(); }));
+  $("fields").querySelectorAll("input").forEach((i) => i.addEventListener("input", () => {
+    F[i.dataset.f] = i.value; showLetter();
+    const fi = FORM_INPUT[i.dataset.f]; if (fi && $(fi).value !== i.value) { $(fi).value = i.value; if (fi === "collNotice") render(); }
+  }));
   const note = u().esnote && u().esnote[id]; $("esnote").hidden = !note; $("esnote").textContent = note || "";
+  $("next").hidden = true;
+  document.body.classList.add("letter-open");
   showLetter(); $("copied").textContent = ""; $("dlg").showModal(); ev("letter_open_" + id);
 }
+$("dlg").addEventListener("close", () => document.body.classList.remove("letter-open"));
 $("rights").addEventListener("click", (e) => { const b = e.target.closest("[data-letter]"); if (b) openLetter(b.dataset.letter); });
 $("closeBtn").onclick = () => $("dlg").close();
 $("copyBtn").onclick = async () => {
   const t = showLetter();
   try { await navigator.clipboard.writeText(t); $("copied").textContent = u().copied; }
   catch (e) { const r = document.createRange(); r.selectNodeContents($("letterText")); const s = getSelection(); s.removeAllRanges(); s.addRange(r); $("copied").textContent = u().selected; }
-  ev("letter_copy_" + openId);
+  showNext(); ev("letter_copy_" + openId);
 };
 $("dlBtn").onclick = () => {
-  const blob = new Blob([showLetter()], { type: "text/plain" }); const u = URL.createObjectURL(blob);
-  const a = document.createElement("a"); a.href = u; a.download = `${openId}-letter.txt`; a.click(); setTimeout(() => URL.revokeObjectURL(u), 1000);
-  ev("letter_download_" + openId);
+  const blob = new Blob([showLetter()], { type: "text/plain" }); const url = URL.createObjectURL(blob);
+  const a = document.createElement("a"); a.href = url; a.download = `${openId}-letter.txt`; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+  showNext(); ev("letter_download_" + openId);
 };
-$("printBtn").onclick = () => {
-  const w = window.open("", "_blank"); if (!w) return;
-  w.document.write(`<pre style="font:14px/1.6 Georgia,serif;white-space:pre-wrap;max-width:40rem;margin:2rem auto">${esc(showLetter())}</pre>`);
-  w.document.close(); w.print(); ev("letter_print_" + openId);
-};
+// print the page itself: the print stylesheet hides everything but #letterText while body.letter-open
+$("printBtn").onclick = () => { showLetter(); window.print(); ev("letter_print_" + openId); };
 
 // line checker
 const lines = [{ date: "", code: "", desc: "", qty: 1, amount: "" }, { date: "", code: "", desc: "", qty: 1, amount: "" }, { date: "", code: "", desc: "", qty: 1, amount: "" }];
 function drawLines() {
   $("lb").innerHTML = lines.map((l, i) => `<tr>${["date", "code", "desc", "qty", "amount"].map((k) =>
     `<td><input type="${k === "qty" || k === "amount" ? "number" : "text"}" data-i="${i}" data-k="${k}" value="${esc(l[k])}" aria-label="${k}"></td>`).join("")}
-    <td><button type="button" class="btn ghost" style="margin:0;padding:.25rem .5rem" data-del="${i}" aria-label="remove line">&times;</button></td></tr>`).join("");
+    <td><button type="button" class="btn ghost del" data-del="${i}" aria-label="remove line">&times;</button></td></tr>`).join("");
 }
 function runLines() {
   const filled = lines.filter((l) => l.desc || l.code || l.amount);

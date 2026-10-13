@@ -4,16 +4,28 @@
 const blank = (v, label) => (v && String(v).trim()) || `[${label}]`;
 const money = (v, label) => (Number(v) > 0 ? Number(v).toLocaleString("en-US") : `[${label}]`);
 
+const longDate = (iso) => {
+  const d = /^\d{4}-\d{2}-\d{2}$/.test(iso || "") ? new Date(iso + "T12:00:00") : null;
+  return d && !isNaN(d) ? d.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : "";
+};
+
 export function letter(id, f, extra = {}) {
+  // a debt validation letter goes to the collector, not the hospital; every other letter goes to the provider
+  const toCollector = id === "validation";
+  const to = toCollector
+    ? `${blank(f.collector, "Collection agency name")}
+${blank(f.collectorAddress, "Collection agency address")}`
+    : `${blank(f.provider, "Hospital or provider name")}
+Billing Department
+${blank(f.providerAddress, "Billing address from your bill")}`;
   const head = `${blank(f.name, "Your full name")}
 ${blank(f.address, "Your mailing address")}
 ${blank(f.today, "Date")}
 
-${blank(f.provider, "Hospital or provider name")}
-Billing Department
-${blank(f.providerAddress, "Billing address from your bill")}
+${to}
 
-Re: Account ${blank(f.account, "Account number")}, patient ${blank(f.patient || f.name, "Patient name")}, date(s) of service ${blank(f.serviceDate, "Date of service")}
+Re: Account ${blank(f.account, "Account number")}, patient ${blank(f.patient || f.name, "Patient name")}, date(s) of service ${blank(f.serviceDate, "Date of service")}${toCollector ? `
+Original creditor: ${blank(f.provider, "Hospital or provider name")}` : ""}
 
 `;
   const close = `
@@ -48,7 +60,7 @@ I am writing about a bill for care I believe is protected by the federal No Surp
 Please correct the bill to my in-network cost-sharing amount and send me the corrected bill. ${hold}`,
     validation: `To whom it may concern:
 
-I am disputing the debt you are trying to collect for the account above. Please provide verification of this debt, including the name of the original creditor, an itemized statement of the amount, and proof that you are authorized to collect it.
+${longDate(f.collectorNotice) ? `Your first notice about this debt is dated ${longDate(f.collectorNotice)}. ` : ""}I am disputing the debt you are trying to collect for the account above. Please provide verification of this debt, including the name of the original creditor, an itemized statement of the amount, and proof that you are authorized to collect it.
 
 Please stop collection activity until you have sent this verification. Please do not report this debt to any credit bureau while it is disputed.`,
     errors: `To the billing department:

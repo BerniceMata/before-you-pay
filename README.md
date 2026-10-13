@@ -27,7 +27,7 @@ English and Spanish (`/bill/es` or the toggle; Spanish terms follow CMS's own Sp
 
 ## Run
 ```
-node --test          # 15 tests, no network
+node --test          # 45 tests, no network
 python -m http.server --directory web 8000
 ```
 
